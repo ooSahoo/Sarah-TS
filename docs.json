@@ -3,14 +3,27 @@
   "theme": "palm",
   "name": "Alfred hospitality AI",
   "colors": {
-    "primary": "#ff3333",
-    "light": "#ff3333",
-    "dark": "#ff3333"
+    "primary": "#6980FF",
+    "light": "#6980FF",
+    "dark": "#6980FF"
   },
   "description": "Alfred Hospitality AI user guides",
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
+      {
+        "tab": "Home",
+        "groups": [
+          {
+            "group": "XXX",
+            "pages": [
+              "index",
+              "quickstart",
+              "development"
+            ]
+          }
+        ]
+      },
       {
         "tab": "Guides",
         "groups": [
@@ -23,7 +36,7 @@
             ]
           },
           {
-            "group": "Essentials",
+            "group": "Journeys",
             "pages": [
               "essentials/markdown",
               "essentials/code",
@@ -31,6 +44,45 @@
               "essentials/settings",
               "essentials/navigation",
               "essentials/reusable-snippets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "APIs",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "index",
+              "quickstart",
+              "development"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDKs",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "index",
+              "quickstart",
+              "development"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Tools",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "index",
+              "quickstart",
+              "development"
             ]
           }
         ]

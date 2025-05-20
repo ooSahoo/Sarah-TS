@@ -1,71 +1,64 @@
----
-title: Introduction
-description: "Welcome to the home of your new documentation"
----
+import { B2CIcon } from "/snippets/B2CIcon.mdx"
 
-<img
-  className="block dark:hidden"
-  src="/images/hero-light.png"
-  alt="Hero Light"
-/>
-<img
-  className="hidden dark:block"
-  src="/images/hero-dark.png"
-  alt="Hero Dark"
-/>
+<B2CIcon />
+  
+# Documentation
 
-## Setting up
+The **Mosaic Platform** by **Transmit Security** secures and simplifies the full customer journey with unified customer identity management, fraud prevention and identity verification services. With a powerful risk engine and layers of orchestrated services, the platform adapts user flows to mitigate risk or elevate trust in real time. Explore the docs to learn everything you need to power your applications with Mosaic.
+
+<CardGroup cols={1}>
+  <Card title="New navigation in Admin Portal" icon="pen-to-square" href="/guides/new_ui_announcement">
+    Get your docs set up locally for easy development
+    <a href="/guides/new_ui_announcement/" target="_blank" style={{ display: "inline-block", padding: "10px 16px", backgroundColor: "#ff5555", color: "#fff", borderRadius: "10px", textDecoration: "none", marginLeft: "10px", marginTop: "10px" }}>
+    What's new?
+    </a>
+  </Card>
+</CardGroup>
+
+## Browse by solution
 
 The first step to world-class documentation is setting up your editing environments.
 
 <CardGroup cols={2}>
   <Card
-    title="Edit Your Docs"
-    icon="pen-to-square"
-    href="https://mintlify.com/docs/quickstart"
+    title="B2C Identity"
+    icon="{B2CIcon}"
+    href="/guides/user/identity_mgmt_overview/"
   >
-    Get your docs set up locally for easy development
+    Manage users and build passwordless experiences
   </Card>
-  <Card
-    title="Preview Changes"
-    icon="image"
-    href="https://mintlify.com/docs/development"
-  >
+  <Card title="Preview Changes" icon="/images/preview_icon.svg" href="https://mintlify.com/docs/development">
     Preview your changes before you push to make sure they're perfect
+  </Card>
+  <Card title="SSO and Federation" icon="/images/b2c_icon.svg">
+    Streamline login experiences
+  </Card>
+  <Card title="Preview Changes" icon="/images/preview_icon.svg" href="https://mintlify.com/docs/development">
+    Preview your changes before you push to make sure they're perfect
+  </Card>
+  <Card title="Fraud Prevention" icon="/images/b2c_icon.svg">
+    Detect risk and establish trust
+  </Card>
+  <Card title="Identity Verification" icon="/images/b2c_icon.svg">
+    Verify user identities using documents
+  </Card>
+  <Card title="B2B Identity" icon="/images/b2c_icon.svg">
+    Help businesses secure access to their apps
   </Card>
 </CardGroup>
 
-## Make it yours
+## Build experiences with Mosaic
 
 Update your docs to your brand and add valuable content for the best user conversion.
 
-<CardGroup cols={2}>
-  <Card
-    title="Customize Style"
-    icon="palette"
-    href="https://mintlify.com/docs/settings/global"
-  >
-    Customize your docs to your company's colors and brands
+<CardGroup cols={3}>
+  <Card title="Journeys" icon="palette" href="https://mintlify.com/docs/settings/global">
+    Launch faster with identity journeys
   </Card>
-  <Card
-    title="Reference APIs"
-    icon="code"
-    href="https://mintlify.com/docs/api-playground/openapi"
-  >
-    Automatically generate endpoints from an OpenAPI spec
+  <Card title="Reference APIs" icon="code" href="https://mintlify.com/docs/api-playground/openapi">
+    Integrate with our API endpoints
   </Card>
-  <Card
-    title="Add Components"
-    icon="screwdriver-wrench"
-    href="https://mintlify.com/docs/content/components/accordions"
-  >
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card
-    title="Get Inspiration"
-    icon="stars"
-    href="https://mintlify.com/customers"
-  >
-    Check out our showcase of our favorite documentation
+  <Card title="SDKs" icon="screwdriver-wrench" href="https://mintlify.com/docs/content/components/accordions">
+    Learn about our client SDKs
   </Card>
 </CardGroup>
