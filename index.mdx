@@ -1,4 +1,4 @@
----
+{/*---
 title: Introduction
 description: "Welcome to the home of your new documentation"
 ---
@@ -69,3 +69,104 @@ Update your docs to your brand and add valuable content for the best user conver
     Check out our showcase of our favorite documentation
   </Card>
 </CardGroup>
+*/}
+
+---
+title: Home
+---
+
+import {
+  Button,
+  Box,
+} from "@redocly/developer-portal/ui";
+import {Cards, Card, Title} from "./components/main-page-components"
+import getStartedBackground from "./images/RiskID/get-started-background.svg"
+import sdkIcon from './images/sdk_ref_icon.svg'
+import apiIcon from './images/api_ref_icon.svg'
+import toolsIcon from './images/dev-tools/dev_tools_icon.svg'
+import riskIcon from './images/risk_icon.svg'
+import b2cIcon from './images/b2c_icon.svg'
+import b2bIcon from './images/b2b_icon.svg'
+import ssoIcon from './images/sso_icon.svg'
+import verifyIcon from './images/idv_icon.svg'
+import idoIcon from './images/ido_icon.svg'
+import workflowsIcon from './images/automated-workflows-icon.svg'
+
+export default ({ children }) => (
+  <div style={{
+    width: '90%',
+    margin: '0px auto 36px',
+    maxWidth: 1150,
+  }}> {children} </div>
+)
+
+<Box>
+  <Title margin="1.35em 0 8px" style={{fontSize: "32px", fontFamily: '"Plus Jakarta Sans", sans-serif'}}>
+    Documentation
+  </Title>
+  <div style={{fontSize: "16px", marginTop: 24, marginBottom: 24, lineHeight: "1.6em"}}>
+    <p>The <b>Mosaic Platform</b> by <b>Transmit Security</b> secures and simplifies the full customer journey with unified customer identity management, fraud prevention and identity verification services. With a powerful risk engine and layers of orchestrated services, the platform adapts user flows to mitigate risk or elevate trust in real time.</p>
+    <p>Explore the docs to learn everything you need to power your applications with Mosaic.</p>
+ </div>
+
+  <div style={{
+    background: `#F6F6F6 url(${getStartedBackground}) no-repeat max(280px, 100%)`,
+    padding: 25,
+    paddingBottom: 0,
+    height: 194,
+    display: 'flex',
+    flexDirection: 'column',
+  }}>
+    <Title margin='0 0 5px'> New navigation in Admin Portal</Title>
+    <div style={{fontSize: "16px", lineHeight: "23px"}}> Mosaic’s navigation has been redesigned for clarity and efficiency</div>
+    <div style={{
+        display: 'flex',
+        justifyContent: 'start',
+        alignItems: 'center',
+        flex: 1
+    }}>
+      <Button to= "/guides/new_ui_announcement/" style={{
+        backgroundColor: '#6981FF',
+        color: '#FFFFFF',
+        padding: '10px 60px',
+        size: 'large',
+        fontSize: '16px',
+      }}> What's new?</Button>
+    </div>
+  </div>
+
+
+  <Title margin="40px 0 12px"> Browse by solution </Title>
+  <Cards>
+    <Card title="B2C Identity" icon={b2cIcon} href="/guides/user/identity_mgmt_overview/">
+      Manage users and build passwordless experiences
+    </Card>
+    <Card title="SSO and Federation" icon={ssoIcon} href="/guides/user/sso_orchestration/sso_overview/">
+      Streamline login experiences
+    </Card>
+    <Card title="Fraud Prevention" icon={riskIcon} href="/guides/risk/overview/">
+      Detect risk and establish trust
+    </Card>
+    <Card title="Identity Verification" icon={verifyIcon} href="/guides/verify/identity_verification_overview/">
+      Verify user identities using documents
+    </Card>
+    <Card title="B2B Identity" icon={b2bIcon} href="/guides/user/b2b/overview/">
+      Help businesses secure access to their apps
+    </Card>
+
+  </Cards>
+
+  <Title margin="40px 0 12px"> Build experiences with Mosaic </Title>
+  <Cards>
+    <Card title="Journeys" isBig={true} icon={idoIcon} href="/guides/journeys_intro/">
+      Launch faster with identity journeys
+    </Card>
+    <Card title="APIs" isBig={true} icon={apiIcon} href="/openapi/api_ref_overview/">
+      Integrate with our API endpoints
+    </Card>
+    <Card title="SDKs" isBig={true} icon={sdkIcon} href="/sdk-ref/sdk_ref_intro/">
+      Learn about our client SDKs
+    </Card>
+  </Cards>
+
+</Box>
