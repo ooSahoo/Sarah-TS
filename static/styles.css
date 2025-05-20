@@ -1,0 +1,375 @@
+#navbar {
+  border-bottom: 1px solid rgb(242, 242, 242);
+}
+
+footer {
+  border-top: 1px solid rgb(242, 242, 242);
+}
+
+#search {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid rgb(134, 147, 160);
+  width: 300px;
+  height: 40px;
+  margin-left: 1.5em;
+}
+
+nav a:hover {
+  color: #6981ff !important;
+}
+
+nav li {
+  background-color: transparent !important;
+}
+
+.token.property.string {
+  color: #ffffff !important;
+}
+
+table {
+  font-size: 15px !important;
+}
+
+th {
+  background-color: #f6f6f6 !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  border-left: 0px !important;
+  border-right: 0px !important;
+}
+
+td {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+.redoc-markdown {
+  color: #000000 !important;
+}
+
+@media screen and (min-width: 900px) {
+  #navbar {
+    background: linear-gradient(0, rgb(242, 242, 242), rgb(242, 242, 242)) 339px /
+        1px no-repeat,
+      linear-gradient(0, rgb(246, 246, 246), rgb(246, 246, 246)) 0 / 340px
+        no-repeat white !important;
+  }
+  aside {
+    margin-top: -1px;
+    z-index: 2;
+  }
+}
+
+
+
+@media screen and (max-width: 899px) {
+  .block-on-mobile {
+    display: block !important;
+  }
+}
+
+/* allows side menu scroll to jump to link location */
+aside > div {
+  scroll-padding: 1px;
+/*
+  scroll-behavior: auto;
+  overflow-y: scroll;
+*/
+}
+
+/* side menu content */
+aside ul > div > div > ul {
+  padding-bottom: 40px !important;
+}
+
+aside ul {
+  display: flex;
+  flex-direction: column;
+/*  height: 100%;*/
+}
+
+aside .external-url i {
+  display: none;
+}
+
+aside .external-url {
+  line-height: 20px;
+  height: 32px;
+}
+
+aside .external-url > div:hover {
+  background-color: transparent;
+}
+
+aside .external-url:nth-last-of-type(3) {
+  margin-top: auto;
+}
+
+aside .external-url:last-of-type {
+  margin-bottom: 16px;
+}
+
+.shadow-on-hover:hover {
+  box-shadow: rgb(0 0 0 / 10%) 0px 0px 12px 0px;
+}
+
+section article {
+  margin-bottom: 100px !important;
+}
+
+section article ol li {
+  margin-top: 14px !important;
+}
+
+section article ul li {
+  margin-top: 1px !important;
+}
+
+/* Badges for visualizing backend vs frontend, first party vs third party in articles */
+.badge-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px 4px 0px 0px;
+
+}
+
+.badge {
+  font-family: Inter;
+  font-style: normal;
+  font-size: 12px;
+  text-align: center;
+  padding: 1px 6px 0px 6px;
+  background: #eeeeee;
+  min-height: 28px;
+  margin: -13px 5px 5px 0px;
+  border-radius: 4px;
+}
+
+.table th {
+  min-width: 200px;
+}
+
+.code-snippets-tabs .snippets-tabs-headers .tab-header.active {
+  color: #52A1C2 !important;
+}
+
+/* Videos */
+
+.video-container {
+  position: relative;
+  width: 100%; /* Adjust as needed */
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Shadow around the container */
+}
+
+.video-thumbnail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  background: url('/static/videos/video-play-button.svg') no-repeat;
+  background-size: contain;
+  width: 64px; /* Adjust as needed */
+  height: 64px; /* Adjust as needed */
+}
+
+.video-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.video-controls {
+  box-shadow: 0px 4px 8px #cccccc;
+}
+
+/* Your custom controls styles */
+.react-player__controls {
+  color: #0B2666;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.customVideoPlayer video::-webkit-media-controls-panel {
+  /* Your previous gradient style for the shadow */
+  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.05) 60%, rgba(0, 0, 0, 0) 80%) !important;
+}
+
+.customGIFframe {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Shadow around the container */
+}
+
+#interactive ~ h2 {
+  color: #52A1C2 !important;
+  font-size: 26px !important;
+}
+
+/* Styling mermaid diagrams */
+
+/* Sequence diagrams: */
+
+/* Box with actor */
+.actor {
+  stroke: transparent !important;
+  fill:white !important;
+}
+
+/* Actor title */
+text.actor {
+  font-family: Inter !important;
+  font-size: 22px !important;
+  font-weight: 600 !important;
+}
+
+/* Arrow text */
+.messageText {
+  font-family: Inter !important;
+  font-size: 18px !important;
+  background-color: #ffffff !important;
+}
+
+/* Steps */
+
+.note {
+  stroke: transparent !important;
+  /*fill: #3DE0DE !important;*/
+  fill: #a2f0ef !important;
+  border-radius: 20px !important;
+}
+
+text.noteText > tspan {
+  font-family: Inter !important;
+  font-size: 18px !important;
+  font-weight: 400;
+  fill: #000000!important;
+}
+
+/* Arrows & lines */
+
+line[id^=actor] {
+  stroke: #6981ff !important;
+  stroke-width: 8px !important;
+}
+
+/* Pink big arrow line */
+line[marker-end="url(#filled-head)"] {
+  stroke: #fc345e !important;
+  color: #fc345e!important;
+}
+
+#filled-head {
+  fill: #fc345e !important;
+}
+
+/* Invisible arrow */
+line[marker-end="url(#crosshead)"] {
+  stroke: #fc345e !important;
+  color: #fc345e!important;
+  display: none !important;
+}
+
+#crosshead {
+  fill: #fc345e !important;
+  display: none !important;
+}
+
+/* Pink line for MosaicAPIs */
+.messageLine0[marker-end^="url(#arrowhead)"] {
+  stroke: #fc345e !important;
+  stroke-width: 2px !important;
+}
+
+/* Black line for app APIs */
+.messageLine1 {
+  stroke-width: 2px !important;
+}
+/* Autonumbering styly */
+.sequenceNumber {
+  fill: black !important;
+}
+
+/* Flow diagrams: */
+
+/* Text inside the container */
+.nodeLabel {
+  font-family: Inter !important;
+  font-size: 12px !important;
+}
+
+.mermaid {
+  line-height: normal !important;
+}
+
+/* Centers the flow chart*/
+.mermaid:has(> svg[aria-roledescription="flowchart-v2"]) {
+  margin: auto;
+  width: 50%;
+}
+
+.wide-mermaid .mermaid:has(> svg[aria-roledescription="flowchart-v2"]) {
+  margin: auto;
+  width: 100%;
+}
+
+
+/* Text on the arrow */
+.edgeLabel {
+  font-family: Inter !important;
+  font-size: 12px !important;
+  background-color: #ffffff !important;
+}
+
+/* Container */
+.label-container {
+  fill: #ffffff !important;
+  stroke: #6981ff !important;
+  stroke-width: 2px !important;
+}
+
+rect {
+  fill: #e1e5ff !important;
+  stroke: #6981ff !important;
+  stroke-width: 2px !important;
+}
+
+circle {
+  fill: #e1e5ff !important;
+  stroke: #6981ff !important;
+  stroke-width: 2px !important;
+}
+
+/* Orchestration table */
+
+.orchestration-be-table {
+  border-collapse: collapse;
+  overflow: hidden;
+  width: auto;
+  margin: 20px 0;
+}
+
+.orchestration-be-table th {
+  color: #52A1C2 !important;
+  padding: 10px;
+  text-align: left;
+}
+
+.orchestration-be-table td {
+  background-color: #ffffff;
+
+  padding: 10px;
+  border: 1px solid #ddd;
+}
