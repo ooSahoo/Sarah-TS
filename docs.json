@@ -3,9 +3,9 @@
   "theme": "palm",
   "name": "Alfred hospitality AI",
   "colors": {
-    "primary": "#ff3333",
-    "light": "#ff3333",
-    "dark": "#ff3333"
+    "primary": "#6980FF",
+    "light": "#6980FF",
+    "dark": "#6980FF"
   },
   "description": "Alfred Hospitality AI user guides",
   "favicon": "/favicon.svg",
