@@ -1,13 +1,19 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "palm",
-  "name": "Alfred hospitality AI",
+  "name": "Mosaic by Transmit Security",
   "colors": {
     "primary": "#6980FF",
     "light": "#6980FF",
     "dark": "#6980FF"
   },
-  "description": "Alfred Hospitality AI user guides",
+  "icons": {
+    "library": "lucide"
+  },
+  "fonts": {
+    "family": "Plus Jakarta Sans"
+  },
+  "description": "",
   "favicon": "/favicon.png",
   "navigation": {
     "tabs": [
@@ -15,11 +21,13 @@
         "tab": "Home",
         "groups": [
           {
-            "group": "XXX",
+            "group": "Home",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "Guides",
+              "Journeys",
+              "APIs",
+              "SDKs",
+              "Tools"
             ]
           }
         ]
@@ -30,9 +38,10 @@
           {
             "group": "Get Started",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "guides/user/new_ui_announcement.md",
+              "guides/user/guides_intro.md",
+              "guides/user/create_new_application.md",
+              "guides/user/retrieve_client_tokens.md"
             ]
           },
           {
@@ -67,9 +76,9 @@
           {
             "group": "Get Started",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "guides/user/guides_intro.mdx",
+              "guides/user/create_new_application.md",
+              "guides/user/retrieve_client_tokens.md"
             ]
           }
         ]
