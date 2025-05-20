@@ -1,0 +1,1116 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Groups",
+    "description": "Manage user groups",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/groups": {
+      "post": {
+        "operationId": "createGroup",
+        "summary": "Create group",
+        "description": "Create a group for your users. <br><br>**Required permissions**: `apps:create`, `[appId]:create`, `groups:create`.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiCreateGroupInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiCreatedResponse-createGroup",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "Group created.",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiGroup"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentifierIsTakenHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAllGroups",
+        "summary": "Get groups",
+        "description": "Retrieve a list of all groups. <br><br>**Required permissions**: `apps:read`, `[appId]:read`, `groups:read`, `apps:list`, `[appId]:list`, `groups:list`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getAllGroups",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "Retrieved groups successfully",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ApiGroup"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/groups/{group_id}": {
+      "get": {
+        "operationId": "getGroupByID",
+        "summary": "Get group by ID",
+        "description": "Retrieve a group by ID. <br><br>**Required permissions**: `apps:read`, `[appId]:read`, `groups:read`.",
+        "parameters": [
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the group to retrieve",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getGroupByID",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The role has been successfully fetched.",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiGroup"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateGroup",
+        "summary": "Update group",
+        "description": "Update a group for your users. Note: Fields that are objects cannot be partially updated, since the new value you set will just replace the current one. <br><br>**Required permissions**: `apps:edit`, `[appId]:edit`, `groups:edit`.",
+        "parameters": [
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the group that should be updated",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiUpdateGroupInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-updateGroup",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The group has been successfully updated.",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiGroup"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteGroup",
+        "summary": "Delete group",
+        "description": "Delete a group. <br><br>**Required permissions**: `apps:delete`, `[appId]:delete`, `groups:delete`.",
+        "parameters": [
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the group to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Group removed."
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupNotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/groups/{group_id}/members": {
+      "post": {
+        "operationId": "assignUsers",
+        "summary": "Add users to group",
+        "description": "Add one or more users as members of a group. <br><br>**Required permissions**: `apps:edit`, `[appId]:edit`, `groups:edit`.",
+        "parameters": [
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the group to assign the users to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiAssignGroupInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Assigned users to group."
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupNotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getGroupUsers",
+        "summary": "Get group's users",
+        "description": "Retrieve all users that are members of a specific group. <br><br>**Required permissions**: `apps:read`, `[appId]:read`, `users:read`.",
+        "parameters": [
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the group to retrieve users for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getGroupUsers",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "Get all users that are members of a group",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ApiUser"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupNotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/groups/{group_id}/members/{user_id}": {
+      "delete": {
+        "operationId": "removeAssignment",
+        "summary": "Remove user from group",
+        "description": "Remove a user from a group. <br><br>**Required permissions**: `apps:edit`, `[appId]:edit`, `groups:edit`.",
+        "parameters": [
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "Group ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed user from group."
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupNotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BadRequestHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "example": "Bad request",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_code": {
+            "type": "number",
+            "example": 400
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiGroup": {
+        "type": "object",
+        "properties": {
+          "group_id": {
+            "type": "string",
+            "description": "Group ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Group name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Group description"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Date group was created in the tenant"
+          },
+          "updated_at": {
+            "type": "number",
+            "description": "Date group was last updated"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Group custom data object"
+          }
+        },
+        "required": [
+          "group_id",
+          "name",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "ApiCreateGroupInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the group to create"
+          },
+          "description": {
+            "type": "string"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Group custom data object"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "IdentifierIsTakenHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "NotFoundHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 404
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiUpdateGroupInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the group to update"
+          },
+          "description": {
+            "type": "string"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Group custom data object"
+          }
+        }
+      },
+      "GroupNotFoundHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Group not found"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 404
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiAssignGroupInput": {
+        "type": "object",
+        "properties": {
+          "user_ids": {
+            "description": "ID of the users to assign to the group",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "user_ids"
+        ]
+      },
+      "ApiUser": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "description": "Primary email address, used as user identifier",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserEmail"
+              }
+            ]
+          },
+          "secondary_emails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUserEmail"
+            }
+          },
+          "phone_number": {
+            "description": "Primary phone number, used as user identifier",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserPhone"
+              }
+            ]
+          },
+          "secondary_phone_numbers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUserPhone"
+            }
+          },
+          "username": {
+            "type": "string",
+            "description": "Username used to identify the user for password login (unless a primary email will be used instead). Defined only if a password was set for the user."
+          },
+          "user_id": {
+            "type": "string",
+            "description": "User ID autogenerated upon user creation"
+          },
+          "birthday": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Birthday as YYYY-MM-DD"
+          },
+          "address": {
+            "description": "User's address",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiAddress"
+              }
+            ]
+          },
+          "name": {
+            "description": "Full name",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserName"
+              }
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "status_changed_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date status was last updated"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Date user was created in the tenant"
+          },
+          "updated_at": {
+            "type": "number",
+            "description": "Date user was last updated"
+          },
+          "identity_providers": {
+            "deprecated": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUserIdentityProvider"
+            }
+          },
+          "identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUserIdentity"
+            }
+          },
+          "last_auth": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user last authenticated"
+          },
+          "external_account_id": {
+            "type": "string",
+            "description": "User identifier in an app, set by the app"
+          },
+          "app_name": {
+            "type": "string",
+            "description": "Name of the app the user is associated with"
+          },
+          "custom_app_data": {
+            "type": "object",
+            "description": "Custom data object for app-related user info"
+          },
+          "groupIds": {
+            "description": "List of group IDs the user is assigned to",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "picture": {
+            "type": "string",
+            "description": "The picture of user, specified as a URL"
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the user, as provided by the browser using the [Accept-Language](https://www.rfc-editor.org/rfc/rfc7231#section-5.3.5) header field"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Custom data object for tenant user info"
+          },
+          "external_user_id": {
+            "type": "string",
+            "description": "A unique identifier in a tenant"
+          },
+          "password_information": {
+            "description": "The information of the user's password",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiPasswordInformation"
+              }
+            ]
+          }
+        },
+        "required": [
+          "user_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "Status": {
+        "type": "string",
+        "enum": [
+          "Active",
+          "Disabled",
+          "Pending"
+        ]
+      },
+      "ApiUserEmail": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Email address"
+          },
+          "email_verified": {
+            "type": "boolean",
+            "description": "Indicates if email was verified (via magic link, social login, or email verification flows)"
+          },
+          "verified_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last verification date of the email"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "ApiUserPhone": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Phone number"
+          },
+          "phone_number_verified": {
+            "type": "boolean",
+            "description": "Indicates if phone number was verified (via SMS OTP or verification flow)"
+          },
+          "verified_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last verification date of the phone number"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "ApiUserIdentityProvider": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Type of identity provider",
+            "enum": [
+              "UserID",
+              "BindID",
+              "Google",
+              "Apple",
+              "Facebook",
+              "Line",
+              "Tiktok",
+              "Transmit Identity",
+              "Transmit Security",
+              "BindIDApi",
+              "Email OTP",
+              "SMS OTP",
+              "Direct OTP",
+              "Email Magic Link",
+              "Password",
+              "Orchestrated",
+              "SAML",
+              "SSO OIDC",
+              "Mobile Biometrics",
+              "totp"
+            ]
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Identifier of the user in the provider's system"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email used by the user to authenticate to this provider"
+          },
+          "first_auth_date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user first authenticated to this provider"
+          },
+          "last_auth_date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user last authenticated to this provider"
+          }
+        },
+        "required": [
+          "source",
+          "identifier",
+          "email",
+          "first_auth_date",
+          "last_auth_date"
+        ]
+      },
+      "ApiUserIdentity": {
+        "type": "object",
+        "properties": {
+          "provider_name": {
+            "type": "string",
+            "description": "Name of identity provider"
+          },
+          "provider_type": {
+            "type": "string",
+            "description": "Indicates whether the identity provider is Transmit (Native) or a social login provider (OAuth2)",
+            "enum": [
+              "OAuth2",
+              "Native",
+              "External"
+            ]
+          },
+          "auth_type": {
+            "type": "string",
+            "enum": [
+              "webauthn",
+              "email_otp",
+              "sms_otp",
+              "direct_otp",
+              "email_magic_link",
+              "password",
+              "oauth2",
+              "saml",
+              "transmit",
+              "totp"
+            ],
+            "description": "Type of authentication method that was used"
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Identifier of the user in the provider's system"
+          },
+          "user_alias": {
+            "description": "Alias used by the user to authenticate to this provider",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserIdentityAlias"
+              }
+            ]
+          },
+          "first_auth_date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user first authenticated to this provider"
+          },
+          "last_auth_date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user last authenticated to this provider"
+          }
+        },
+        "required": [
+          "provider_name",
+          "provider_type",
+          "auth_type",
+          "identifier",
+          "first_auth_date",
+          "last_auth_date"
+        ]
+      },
+      "ApiAddress": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Country",
+            "maximum": 30
+          },
+          "state": {
+            "type": "string",
+            "description": "State",
+            "maximum": 30
+          },
+          "city": {
+            "type": "string",
+            "description": "City",
+            "maximum": 30
+          },
+          "street_address": {
+            "type": "string",
+            "description": "Street address",
+            "maximum": 150
+          },
+          "postal_code": {
+            "type": "string",
+            "description": "Postal code",
+            "maximum": 30
+          },
+          "type": {
+            "$ref": "#/components/schemas/AddressType"
+          },
+          "updated_at": {
+            "type": "number",
+            "description": "Date user's address was last updated"
+          }
+        }
+      },
+      "ApiUserName": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title",
+            "maximum": 30
+          },
+          "first_name": {
+            "type": "string",
+            "description": "User's first name",
+            "maximum": 30
+          },
+          "last_name": {
+            "type": "string",
+            "description": "User's last name",
+            "maximum": 30
+          },
+          "middle_name": {
+            "type": "string",
+            "description": "User's middle name",
+            "maximum": 30
+          }
+        }
+      },
+      "ApiPasswordInformation": {
+        "type": "object",
+        "properties": {
+          "expired": {
+            "type": "boolean",
+            "description": "Whether the password is currently expired"
+          },
+          "temporary": {
+            "type": "boolean",
+            "description": "Whether the password must be reset after first use"
+          },
+          "updated_at": {
+            "type": "number",
+            "description": "The date the password was last updated, as unix epoch in milliseconds"
+          },
+          "expires_in": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The date the password will be expired"
+          }
+        },
+        "required": [
+          "expired",
+          "temporary",
+          "updated_at"
+        ]
+      },
+      "AddressType": {
+        "type": "string",
+        "enum": [
+          "Home",
+          "Work",
+          "Other"
+        ]
+      },
+      "ApiUserIdentityAlias": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Alias type, which varies based on authentication method",
+            "enum": [
+              "username",
+              "email",
+              "phone_number",
+              "unspecified"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "description": "Alias value"
+          }
+        },
+        "required": [
+          "type",
+          "value"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

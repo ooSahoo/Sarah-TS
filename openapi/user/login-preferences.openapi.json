@@ -1,0 +1,919 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Login Preferences",
+    "description": "Manage your authentication methods",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/loginPreferences/{appId}": {
+      "get": {
+        "operationId": "getLoginPreferencesByAppById",
+        "summary": "Get auth methods",
+        "description": "Retrieves all auth methods for a specific application. <br><br>**Required permissions**: `apps:read`, `*:read`, `config:read`, `authentication-methods:read`, `[appId]:read`.",
+        "parameters": [
+          {
+            "name": "appId",
+            "required": true,
+            "in": "path",
+            "description": "ID of the application to retrieve auth methods for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getLoginPreferencesByAppById",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "Successfully fetched app login preferences",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiLoginPreferences"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/loginPreferences/{appId}/authMethods": {
+      "put": {
+        "operationId": "updateAppAuthMethods",
+        "summary": "Update auth methods",
+        "description": "Updates auth methods of a specific application. Note: Fields that are objects cannot be partially updated, since the new value you set will just replace the current one. <br><br>**Required permissions**: `apps:edit`, `*:edit`, `config:edit`, `authentication-methods:edit`, `[appId]:edit`.",
+        "parameters": [
+          {
+            "name": "appId",
+            "required": true,
+            "in": "path",
+            "description": "ID of the application to update auth methods for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiUpdateAuthMethodsInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-updateAppAuthMethods",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "Methods updated",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiLoginPreferences"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BadRequestHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "example": "Bad request",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_code": {
+            "type": "number",
+            "example": 400
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "NotFoundHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 404
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiLoginPreferences": {
+        "type": "object",
+        "properties": {
+          "auth_methods": {
+            "description": "Login preferences",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiAuthMethods"
+              }
+            ]
+          }
+        },
+        "required": [
+          "auth_methods"
+        ]
+      },
+      "ApiUpdateAuthMethodsInput": {
+        "type": "object",
+        "properties": {
+          "google": {
+            "description": "Google login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSecretConfiguration"
+              }
+            ]
+          },
+          "line": {
+            "description": "Line login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSecretConfiguration"
+              }
+            ]
+          },
+          "email": {
+            "description": "Email magic llink login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailConfiguration"
+              }
+            ]
+          },
+          "email_otp": {
+            "description": "Email one time password login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailOtpConfiguration"
+              }
+            ]
+          },
+          "sms": {
+            "description": "SMS one time password login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SMSConfiguration"
+              }
+            ]
+          },
+          "apple": {
+            "description": "Apple login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AppleConfiguration"
+              }
+            ]
+          },
+          "facebook": {
+            "description": "Facebook login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSecretConfiguration"
+              }
+            ]
+          },
+          "webauthn_api": {
+            "description": "WebAuthn API configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WebAuthnApiConfiguration"
+              }
+            ]
+          },
+          "password": {
+            "description": "passwords login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PasswordConfiguration"
+              }
+            ]
+          },
+          "totp": {
+            "description": "TOTP login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TotpConfiguration"
+              }
+            ]
+          },
+          "push": {
+            "description": "Push login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PushConfiguration"
+              }
+            ]
+          },
+          "tiktok": {
+            "description": "Tiktok login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSecretConfiguration"
+              }
+            ]
+          }
+        }
+      },
+      "ApiAuthMethods": {
+        "type": "object",
+        "properties": {
+          "google": {
+            "description": "Google login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSecretConfiguration"
+              }
+            ]
+          },
+          "facebook": {
+            "description": "Facebook login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSecretConfiguration"
+              }
+            ]
+          },
+          "email": {
+            "description": "Email magic link login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailConfiguration"
+              }
+            ]
+          },
+          "email_otp": {
+            "description": "Email one time password login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailOtpConfiguration"
+              }
+            ]
+          },
+          "apple": {
+            "description": "Apple login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AppleConfiguration"
+              }
+            ]
+          },
+          "sms": {
+            "description": "SMS one time password login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SMSConfiguration"
+              }
+            ]
+          },
+          "webauthn_api": {
+            "description": "WebAuthn API configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WebAuthnApiConfiguration"
+              }
+            ]
+          },
+          "line": {
+            "description": "Line login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSecretConfiguration"
+              }
+            ]
+          },
+          "password": {
+            "description": "Password login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PasswordConfiguration"
+              }
+            ]
+          },
+          "totp": {
+            "description": "TOTP login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TotpConfiguration"
+              }
+            ]
+          },
+          "push": {
+            "description": "Push configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PushConfiguration"
+              }
+            ]
+          },
+          "tiktok": {
+            "description": "TikTok login configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSecretConfiguration"
+              }
+            ]
+          },
+          "pin_authenticator": {
+            "description": "PIN authenticator configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PinAuthenticatorConfiguration"
+              }
+            ]
+          }
+        }
+      },
+      "ClientSecretConfiguration": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "description": "Client ID retrieved from the identity provider"
+          },
+          "clientSecret": {
+            "type": "string",
+            "description": "Client Secret retrieved from the identity provider"
+          },
+          "redirectUris": {
+            "description": "List of URIs approved for redirects for your client",
+            "example": [
+              "https://www.example.com/login"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "clientId"
+        ]
+      },
+      "EmailConfiguration": {
+        "type": "object",
+        "properties": {
+          "expiresIn": {
+            "type": "number",
+            "description": "Number of minutes until the email link/code expires"
+          },
+          "message": {
+            "$ref": "#/components/schemas/MessageConfiguration"
+          }
+        },
+        "required": [
+          "expiresIn",
+          "message"
+        ]
+      },
+      "EmailOtpConfiguration": {
+        "type": "object",
+        "properties": {
+          "expiresIn": {
+            "type": "number",
+            "description": "Number of minutes until the OTP expires"
+          },
+          "lockoutDuration": {
+            "type": "number",
+            "description": "OTP lockout duration (in minutes) after maximum attempts are reached",
+            "example": 15
+          },
+          "maxFailures": {
+            "type": "number",
+            "description": "Number of wrong OTP attempts allowed before the passcode is invalidated. Must be between 1 and 20.",
+            "example": 3
+          },
+          "codeLength": {
+            "type": "number",
+            "description": "The length of the generated OTP code. Must be between 4 and 8.",
+            "example": 6
+          },
+          "message": {
+            "$ref": "#/components/schemas/MessageConfiguration"
+          }
+        },
+        "required": [
+          "expiresIn",
+          "maxFailures",
+          "message"
+        ]
+      },
+      "SMSConfiguration": {
+        "type": "object",
+        "properties": {
+          "expiresIn": {
+            "type": "number",
+            "description": "Number of minutes until the OTP expires"
+          },
+          "lockoutDuration": {
+            "type": "number",
+            "description": "OTP lockout duration (in minutes) after maximum attempts are reached",
+            "example": 15
+          },
+          "maxFailures": {
+            "type": "number",
+            "description": "Number of wrong OTP attempts allowed before the passcode is invalidated. Must be between 1 and 20.",
+            "example": 3
+          },
+          "codeLength": {
+            "type": "number",
+            "description": "The length of the generated OTP code. Must be between 4 and 8.",
+            "example": 6
+          }
+        },
+        "required": [
+          "expiresIn",
+          "maxFailures"
+        ]
+      },
+      "AppleConfiguration": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "description": "Services ID retrieved from Apple"
+          },
+          "clientSecret": {
+            "type": "string",
+            "description": "Client Secret Signing Key retrieved from Apple"
+          },
+          "redirectUris": {
+            "description": "List of URIs approved for redirects for your client",
+            "example": [
+              "https://www.example.com/login"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "appleTeamId": {
+            "type": "string",
+            "description": "Apple Team ID"
+          },
+          "keyId": {
+            "type": "string",
+            "description": "Apple Key ID"
+          }
+        },
+        "required": [
+          "clientId",
+          "appleTeamId",
+          "keyId"
+        ]
+      },
+      "WebAuthnApiConfiguration": {
+        "type": "object",
+        "properties": {
+          "rpId": {
+            "type": "string",
+            "description": "Domain to which WebAuthn credentials are registered and used to authenticate (e.g., example.com)"
+          },
+          "rpOrigin": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Web origin that will be used to request registration and authentication. The origin must match the domain of the RP ID, but may be a subdomain of the RP ID (e.g., https://login.example.com ). The origin must also include the HTTPS scheme and port (if relevant)."
+          },
+          "rpOrigins": {
+            "description": "A list of Web origins that will be used to request registration and authentication. The origin must match the domain of the RP ID, but may be a subdomain of the RP ID (e.g., https://login.example.com ). The origin must also include the HTTPS scheme and port (if relevant).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "replaceExistingPasskey": {
+            "type": "boolean",
+            "description": "Set to true in order to replace the existing passkey. Default is False.",
+            "default": false
+          }
+        },
+        "required": [
+          "rpId"
+        ]
+      },
+      "PasswordConfiguration": {
+        "type": "object",
+        "properties": {
+          "resetValidityMinutes": {
+            "type": "number",
+            "description": "Number of minutes until reset password token/OTP expires.",
+            "default": 5,
+            "example": 5,
+            "minimum": 5,
+            "maximum": 60
+          },
+          "passwordComplexity": {
+            "type": "number",
+            "description": "Password complexity. Must be between 1 and 5.",
+            "default": 5,
+            "example": 5,
+            "minimum": 1,
+            "maximum": 5
+          },
+          "passwordMinLength": {
+            "type": "number",
+            "description": "Minimum required length of the password.",
+            "default": 14,
+            "example": 14,
+            "minimum": 5,
+            "maximum": 14
+          },
+          "blockPreviousPasswords": {
+            "type": "number",
+            "description": "Number of most recent passwords to block the user from setting as their new password.",
+            "default": 0,
+            "example": 0,
+            "minimum": 0,
+            "maximum": 20
+          },
+          "checkHibp": {
+            "type": "boolean",
+            "description": "Check password updates against HIBP.",
+            "default": false
+          },
+          "checkDictionary": {
+            "type": "boolean",
+            "description": "Check password updates against a predefined dictionary.",
+            "default": false
+          },
+          "passwordExpiresIn": {
+            "type": "number",
+            "description": "Number of days until the password expires. Must be between 1 and 1096 days (3 years).",
+            "default": 90,
+            "example": 90,
+            "minimum": 1,
+            "maximum": 1096
+          },
+          "ignoreExpiration": {
+            "type": "boolean",
+            "description": "Ignore password expiration. If true, the password will never expire.",
+            "default": false
+          },
+          "maxPasswordFailures": {
+            "type": "number",
+            "description": "Number of wrong password attempts allowed before the user is suspended. Must be between 1 and 20.",
+            "default": 5,
+            "example": 5,
+            "minimum": 1,
+            "maximum": 20
+          },
+          "passwordSuspensionDuration": {
+            "type": "number",
+            "description": "Number of minutes to suspend the user from authenticating using password after the maximum number of allowed failed attempts is exceeded. Must be between 1 and 525600 minutes (1 year).",
+            "default": 15,
+            "example": 15,
+            "minimum": 1,
+            "maximum": 525600
+          },
+          "failuresExpireIn": {
+            "type": "number",
+            "description": "Number of minutes until previous failed attempts are considered expired. Must be between 1 and 525600 minutes (1 year).",
+            "default": 15,
+            "example": 15,
+            "minimum": 1,
+            "maximum": 525600
+          },
+          "tempPasswordValidityHours": {
+            "type": "number",
+            "description": "Number of hours until temporary passwords are considered expired. Must be between 1 and 8760 hours (1 year).",
+            "example": 24,
+            "minimum": 1,
+            "maximum": 8760
+          },
+          "message": {
+            "$ref": "#/components/schemas/MessageConfiguration"
+          },
+          "requireMFA": {
+            "type": "boolean",
+            "description": "Require multi-factor authentication for password reset flows.",
+            "default": false
+          },
+          "codeLength": {
+            "type": "number",
+            "description": "The length of the generated OTP code. Must be between 4 and 8.",
+            "example": 6
+          },
+          "notifyOnPasswordUpdate": {
+            "type": "boolean",
+            "default": false,
+            "description": "Send email to end-user upon password update"
+          }
+        },
+        "required": [
+          "resetValidityMinutes",
+          "passwordComplexity",
+          "passwordMinLength",
+          "blockPreviousPasswords",
+          "passwordExpiresIn",
+          "maxPasswordFailures",
+          "passwordSuspensionDuration",
+          "message"
+        ]
+      },
+      "TotpConfiguration": {
+        "type": "object",
+        "properties": {
+          "algorithm": {
+            "type": "string",
+            "enum": [
+              "sha1",
+              "sha256",
+              "sha512"
+            ],
+            "description": "The algorithm used to generate the TOTP code",
+            "default": "sha1"
+          },
+          "digits": {
+            "type": "number",
+            "description": "Number of digits in the generated TOTP code, must be 6 or 8",
+            "example": 6,
+            "default": 6
+          },
+          "period": {
+            "type": "number",
+            "description": "Number of seconds in which the TOTP code is valid",
+            "example": 30,
+            "default": 30
+          },
+          "window": {
+            "type": "number",
+            "description": "Number of windows to check for valid TOTP codes",
+            "example": 2,
+            "default": 1
+          },
+          "issuer": {
+            "type": "string",
+            "description": "TOTP issuer",
+            "example": "My Company"
+          },
+          "maxFailures": {
+            "type": "number",
+            "description": "Number of wrong TOTP attempts allowed before the passcode is invalidated. Must be between 1 and 20.",
+            "example": 3,
+            "default": 5
+          },
+          "lockoutDuration": {
+            "type": "number",
+            "description": "TOTP lockout duration (in minutes) after maximum attempts are reached",
+            "example": 15,
+            "default": 15
+          }
+        }
+      },
+      "PushConfiguration": {
+        "type": "object",
+        "properties": {
+          "apn": {
+            "description": "APN configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/APNConfiguration"
+              }
+            ]
+          },
+          "fcm": {
+            "description": "FCM configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FcmConfiguration"
+              }
+            ]
+          }
+        }
+      },
+      "MessageConfiguration": {
+        "type": "object",
+        "properties": {
+          "primaryColor": {
+            "type": "string",
+            "description": "Primary color of the email, specified as a Hex color"
+          },
+          "from": {
+            "type": "string",
+            "description": "Origin of the email message"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Subject of the email message"
+          }
+        },
+        "required": [
+          "primaryColor"
+        ]
+      },
+      "PinAuthenticatorConfiguration": {
+        "type": "object",
+        "properties": {
+          "maxFailures": {
+            "type": "number",
+            "description": "Number of wrong PIN Authenticator attempts allowed before the passcode is invalidated. Must be between 1 and 20.",
+            "example": 3,
+            "default": 5
+          },
+          "lockoutDuration": {
+            "type": "number",
+            "description": "PIN Authenticator lockout duration (in minutes) after maximum attempts are reached",
+            "example": 15,
+            "default": 15
+          },
+          "failuresExpireIn": {
+            "type": "number",
+            "description": "Number of minutes until previous failed attempts are considered expired. Must be between 1 and 525600 minutes (1 year).",
+            "default": 15,
+            "example": 15,
+            "minimum": 1,
+            "maximum": 525600
+          }
+        }
+      },
+      "APNConfiguration": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "APN key"
+          },
+          "keyId": {
+            "type": "string",
+            "description": "APN key id"
+          },
+          "teamId": {
+            "type": "string",
+            "description": "APN team id"
+          },
+          "bundle": {
+            "type": "string",
+            "description": "APN bundle"
+          },
+          "isProduction": {
+            "type": "boolean",
+            "description": "Is Production APN Environment"
+          }
+        },
+        "required": [
+          "key",
+          "keyId",
+          "teamId",
+          "bundle"
+        ]
+      },
+      "FcmConfiguration": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "object",
+            "description": "FCM key"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

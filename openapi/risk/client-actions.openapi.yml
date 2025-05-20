@@ -1,0 +1,311 @@
+openapi: 3.1.0
+info:
+  title: Client Actions
+  version: ''
+  description: This backend API is used to report client actions, add the user context and report action results, allowing Fraud Prevention reporting and user profiling.
+
+servers:
+  - url: https://api.transmitsecurity.io/risk/v1
+  - url: https://api.eu.transmitsecurity.io/risk/v1
+  - url: https://api.ca.transmitsecurity.io/risk/v1
+
+paths:
+  /action/trigger-action:
+    post:
+      summary: Trigger action event
+      description: Report a client action event that occurs in an SDK session
+      operationId: triggerAnAction
+      security:
+        - risk_access_token: []
+      parameters:
+        - name: get_recommendation
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: A flag for getting the recommendation for the triggered action (for saving another recommendation backend call)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/triggeraction'
+      responses:
+        '201':
+          $ref: '#/components/responses/trigger_action_received_and_stored'
+        '400':
+          $ref: '#/components/responses/bad_request'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '429':
+          $ref: '#/components/responses/rate_limit_reached'
+        '500':
+          $ref: '#/components/responses/internal_error'
+  /action/result:
+    post:
+      summary: Report action result
+      description: Reports the result of an action that a recommendation was issued for. This includes whether the user successfully completed the action, and what type of challenge was given to the user (if any).
+      operationId: reportActionResult
+      security:
+        - risk_access_token: []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/actionResult'
+      responses:
+        '201':
+          $ref: '#/components/responses/action_result_received_and_stored'
+        '400':
+          $ref: '#/components/responses/bad_request'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '429':
+          $ref: '#/components/responses/rate_limit_reached'
+        '500':
+          $ref: '#/components/responses/internal_error'
+  /action/authenticated-user:
+    post:
+      summary: Set authenticated user
+      description: Sets the user context for a client action reported to the SDK. It should be set only after you've fully authenticated the user (including, for example, any 2FA that was required). This call is **deprecated**, set the user with [Report action result API](/openapi/risk/client-actions/#operation/reportActionResult).
+      operationId: setAuthUser
+      deprecated: true
+      security:
+        - risk_access_token: []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/authuser'
+      responses:
+        '201':
+          $ref: '#/components/responses/userauth_received_and_stored'
+        '400':
+          $ref: '#/components/responses/bad_request'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '429':
+          $ref: '#/components/responses/rate_limit_reached'
+        '500':
+          $ref: '#/components/responses/internal_error'
+  /action/assignee:
+    put:
+      summary: Assign actions
+      description: Set assignee for a list of actions.
+      operationId: updateActionAssignee
+      security:
+        - risk_access_token: []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/setAssignee'
+      responses:
+        '200':
+          $ref: '#/components/responses/actions_assignee_response'
+        '400':
+          $ref: '#/components/responses/bad_request'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/not_found'
+        '429':
+          $ref: '#/components/responses/rate_limit_reached'
+        '500':
+          $ref: '#/components/responses/internal_error'
+components:
+  schemas:
+    triggeraction:
+      type: object
+      required:
+        - session_token
+        - action_type
+      properties:
+        session_token:
+          type: string
+          description: A token returned by the SDK for the session established upon SDK initialization.
+        action_type:
+          type: string
+          description: The action type
+          example: 'transaction'
+        user_id:
+          type: string
+          description: Opaque identifier of the authenticated user in your system.
+        claimed_user_id_type:
+          type: string
+          enum:
+            - email
+            - phone_number
+            - account_id
+            - ssn
+            - national_id
+            - passport_number
+            - drivers_license_number
+            - other
+          description: >
+            Specifies the type of value provided in the claimed_user_id field. This field is especially important when claimed_user_id contains a hashed value, as it clarifies the original data type used.
+        claimed_user_id:
+          type: string
+          description: User identifier of the not yet authenticated user, used to enhance risk and trust assessments. This field should not contain sensitive data in plain text. Once the user has authenticated, to set the user, report the action result via API call or call 'setAuthenticatedUser' from the client SDK.
+        correlation_id:
+          type: string
+          description: Any ID that could help relate the action with external context or session
+        transaction_data:
+          type: object
+          description: Transaction data-points given in the relevant action
+          properties:
+            amount:
+              type: number
+              description: The amount of the transaction
+              example: 120
+            currency:
+              type: string
+              description: The currency used for the transaction
+              example: 'USD'
+            reason:
+              type: string
+              description: The reason for the transaction
+            transactionDate:
+              type: integer
+              description: The transaction timestamp date
+            payer:
+              type: object
+              description: The provided data points for the transaction payer
+              properties:
+                name:
+                  type: string
+                  description: Payer name
+                bankIdentifier:
+                  type: string
+                  description: Payer bank identifier
+                branchIdentifier:
+                  type: string
+                  description: Payer branch identifier
+                accountNumber:
+                  type: string
+                  description: Payer account number
+            payee:
+              type: object
+              description: The provided data points for the transaction payee
+              properties:
+                name:
+                  type: string
+                  description: Payee name
+                bankIdentifier:
+                  type: string
+                  description: Payee bank identifier
+                branchIdentifier:
+                  type: string
+                  description: Payee branch identifier
+                accountNumber:
+                  type: string
+                  description: Payee account number
+    actionResult:
+      type: object
+      required:
+        - action_token
+        - result
+      properties:
+        action_token:
+          type: string
+          description: The token return when the action event was reported
+        result:
+          type: string
+          enum: [success, failure, incomplete]
+          description: The action result.
+        user_id:
+          type: string
+          description: Opaque identifier of the user in your system.
+        private_user_identifier:
+          type: string
+          description: Identifier containing sensitive user data. Mosaic will encrypt and securely store this data.
+        challenge_type:
+          type: string
+          enum: [sms_otp, email_otp, totp, push_otp, voice_otp, idv, captcha, password, passkey]
+          description: Type of challenge used, in case a challenge was recommended for this action event
+    authuser:
+      type: object
+      required:
+        - action_token
+        - user_id
+      properties:
+        user_id:
+          type: string
+          description: Opaque identifier of the user in your system.
+        action_token:
+          type: string
+          description: The token return by the SDK when the action was reported.
+    setAssignee:
+      type: object
+      properties:
+        action_ids:
+          type: array
+          items:
+            type: string
+            description: List of action IDs
+            example: ea49707f023f48d64a7a817a2e7a5ff4277281a8f8ac1848ccac407967d9d2ce
+        assignee:
+          type: string
+          description: The email of the user to assign the actions to.
+  responses:
+    trigger_action_received_and_stored:
+      description: Trigger action has been received and stored successfully.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              action_token:
+                type: string
+    actions_assignee_response:
+      description: Assignee was updated for all requested actions.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: Defines if the operation was successful.
+              affectedActionsCount:
+                type: number
+                example: 4
+                description: The number of assigned actions.
+    action_result_received_and_stored:
+      description: Action result has been received and stored successfully.
+    userauth_received_and_stored:
+      description: User Auth has been received and stored successfully.
+    unauthorized:
+      description: Invalid authentication
+    forbidden:
+      description: Invalid authorization
+    rate_limit_reached:
+      description: Rate limit reached
+    internal_error:
+      description: Internal error
+    bad_request:
+      description: Bad request
+    not_found:
+      description: Not found
+
+  securitySchemes:
+    risk_access_token:
+      type: http
+      scheme: bearer
+      description: "An access token generated by the [token endpoint](/openapi/token/#operation/getAccessToken), which should target the following resource: `https://risk.identity.security`"
+      bearerFormat: JWT

@@ -1,0 +1,632 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Webhooks",
+    "description": "Subscribe to webhooks to get notified of specific events. Webhooks provide instant, real-time notifications, without requiring you to send API calls at regular time internals in order to detect changes in data.",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/webhooks": {
+      "post": {
+        "operationId": "createWebhook",
+        "summary": "Create webhook",
+        "description": "Create a new webhook to listen for selected events. Created webhooks need to be verified and then enabled before they can be used",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiCreateWebhookInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiCreatedResponse-createWebhook",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The webhook has been created.",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiCreateWebhookInput"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getWebhooks",
+        "summary": "Get all webhooks",
+        "description": "Get a list of all configured webhooks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getWebhooks",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ApiWebhook"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/webhooks/{webhook_id}": {
+      "get": {
+        "operationId": "getWebhookById",
+        "summary": "Get webhook by ID",
+        "description": "Get a webhook with a given ID",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the webhook to search for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getWebhookById",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiWebhook"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "editWebhook",
+        "summary": "Update webhook",
+        "description": "Update a webhook with a given ID",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the webhook to update",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiEditWebhookInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-editWebhook",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiWebhook"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "WebhookActivation",
+        "summary": "Enable or disable webhook",
+        "description": "Enables or disables a webhook for the given ID",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the webhook to enable or disable",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiToggleWebhookInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteWebhook",
+        "summary": "Delete webhook",
+        "description": "Delete a webhook with a given ID",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the webhook to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/webhooks/verify/{webhook_id}": {
+      "post": {
+        "operationId": "WebhookVerification",
+        "summary": "Verify webhook",
+        "description": "Triggers a flow that verifies you own the webhook resource. When triggered, a GET request with an X-Verification-Key header is sent to the webhook URL, and your resource must respond with a key field that contains the X-Verification-Key header value.",
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the webhook to verify",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-WebhookVerification",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiVerifyWebhook"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BadRequestHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "example": "Bad request",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_code": {
+            "type": "number",
+            "example": 400
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiWebhook": {
+        "type": "object",
+        "properties": {
+          "webhook_id": {
+            "type": "string",
+            "description": "Webhook ID autogenerated upon creation"
+          },
+          "uri": {
+            "type": "string",
+            "description": "URL to which notifications are sent"
+          },
+          "api_key": {
+            "type": "string",
+            "description": "Used to authenticate notifications (sent via X-API-Key header)"
+          },
+          "subscribed_events": {
+            "type": "array",
+            "example": [
+              "User created",
+              "User deleted"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "User created",
+                "User updated",
+                "User deleted",
+                "User removed from app",
+                "User added to app",
+                "User suspended",
+                "User unsuspended",
+                "User password lock",
+                "User logged in",
+                "User logged out",
+                "Failed OTP attempt"
+              ]
+            }
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When the webhook was created"
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Indicates whether the webhook was verified"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Indicates whether the webhook is enabled"
+          },
+          "name": {
+            "type": "string",
+            "description": "Friendly name of the webhook"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the webhook"
+          }
+        },
+        "required": [
+          "webhook_id",
+          "uri",
+          "api_key",
+          "subscribed_events",
+          "created_at",
+          "verified",
+          "enabled",
+          "name",
+          "description"
+        ]
+      },
+      "ApiCreateWebhookInput": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "URL to which notifications are sent"
+          },
+          "api_key": {
+            "type": "string",
+            "description": "Used to authenticate notifications (sent via X-API-Key header)"
+          },
+          "subscribed_events": {
+            "type": "array",
+            "example": [
+              "User created",
+              "User deleted"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "User created",
+                "User updated",
+                "User deleted",
+                "User removed from app",
+                "User added to app",
+                "User suspended",
+                "User unsuspended",
+                "User password lock",
+                "User logged in",
+                "User logged out",
+                "Failed OTP attempt"
+              ]
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Friendly name of the webhook"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the webhook"
+          }
+        },
+        "required": [
+          "uri",
+          "api_key"
+        ]
+      },
+      "ApiEditWebhookInput": {
+        "type": "object",
+        "properties": {
+          "api_key": {
+            "type": "string",
+            "description": "Used to authenticate notifications (sent via X-API-Key header)"
+          },
+          "subscribed_events": {
+            "type": "array",
+            "example": [
+              "User created",
+              "User deleted"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "User created",
+                "User updated",
+                "User deleted",
+                "User removed from app",
+                "User added to app",
+                "User suspended",
+                "User unsuspended",
+                "User password lock",
+                "User logged in",
+                "User logged out",
+                "Failed OTP attempt"
+              ]
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Friendly name of the webhook"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the webhook"
+          }
+        }
+      },
+      "ApiToggleWebhookInput": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Indicates whether the webhook should be enabled"
+          }
+        },
+        "required": [
+          "enabled"
+        ]
+      },
+      "ApiVerifyWebhook": {
+        "type": "object",
+        "properties": {
+          "verified": {
+            "type": "boolean",
+            "description": "Indicates whether the webhook was verified"
+          }
+        },
+        "required": [
+          "verified"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

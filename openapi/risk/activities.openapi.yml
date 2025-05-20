@@ -1,0 +1,1545 @@
+openapi: 3.0.2
+info:
+  title: Event Streaming
+  version: ''
+  description: Stay accountable and keep track of activity by streaming platform events.
+servers:
+  - url: https://api.transmitsecurity.io/activities/v1
+    description: Production environment (US, global)
+  - url: https://api.eu.transmitsecurity.io/activities/v1
+    description: Production environment (EU)
+  - url: https://api.ca.transmitsecurity.io/activities/v1
+    description: Production environment (Canada)
+  - url: https://api.sbx.transmitsecurity.io/activities/v1
+    description: Sandbox environment
+
+paths:
+  /activities/user:
+    get:
+      summary: Get user activities
+      description: Retrieve a list of user activities that occurred within the last 30 days. For registered users, Transmit captures events such as password resets, failed user logins, or registering biometrics
+      operationId: getUserActivities
+      deprecated: true
+      parameters:
+        - name: batch_size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+          description: The maximum number of user activities to return
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAuditLogEntry'
+        401:
+          description: Unauthorized
+        500:
+          description: Internal server error
+      security:
+        - oauth2: []
+  /activities/admin:
+    get:
+      summary: Get admin activities
+      description: Retrieve a list of admin activities that occurred within the last 30 days. Transmit reports events such as creating or deleting an admin, creating a management app, or updating audit settings
+      operationId: getAdminActivities
+      deprecated: true
+      parameters:
+        - name: batch_size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+          description: The maximum number of admin activities to return
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminAuditLogEntry'
+        401:
+          description: Unauthorized
+        500:
+          description: Internal server error
+      security:
+        - oauth2: []
+  /activities/start-collect:
+    put:
+      summary: Start collecting events
+      description: Start collecting events of a specific type. Transmit can report events related to authentication and user management (cis), management apps and settings (admin), identity verifications (verify), and Fraud Prevention (risk).
+      operationId: StartCollectEvents
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            enum: [cis, admin, verify, risk]
+          description: The event type to collect
+      responses:
+        200:
+          description: 'Start collecting \<TYPE\> events.'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        409:
+          description: Resource already exists in the project
+        500:
+          description: Internal server error
+      security:
+        - oauth2: []
+  /activities/stream:
+    put:
+      summary: Create event stream
+      description: Create an event stream for a specific type of events. Transmit can report events related to authentication and user management (cis), management apps and settings (admin), identity verifications (verify), and Fraud Prevention (risk).
+      operationId: CreateEventsStream
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            enum: [ cis, admin, verify, risk ]
+          description: The event type to collect
+        - name: stream_id
+          required: true
+          in: query
+          schema:
+            type: string
+          description: Event stream ID to collect events from
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enrichment:
+                  type: boolean
+                  description: Enrich the events with private data
+      responses:
+        200:
+          description: 'Events stream: \<STREAM_ID\>, with \<TYPE\> events, was created successfully.'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: 'Cannot handle request without performing start collect action first.'
+        406:
+          description: 'stream_id parameter is required and must be a continuous non-empty string.'
+        409:
+          description: Resource already exists in the project
+        429:
+          description: 'Tenant has reached the maximum number of event streams.'
+        500:
+          description: Internal server error
+      security:
+        - oauth2: []
+    delete:
+      summary: Delete event stream
+      description: Remove an event stream.
+      operationId: disableEventsStream
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            enum: [ cis, admin, verify, risk ]
+          description: The event type.
+        - name: stream_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The ID of the stream to delete
+      responses:
+        200:
+          description: 'Events stream: \<STREAM_ID\>, with \<TYPE\> events, was deleted successfully.'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: 'Cannot handle request without performing start collect action first.'
+        404:
+          description: 'Stream not found.'
+        406:
+          description: 'stream_id parameter is required and must be a continuous non-empty string.'
+        500:
+          description: Internal server error
+      security:
+        - oauth2: []
+  /activities/collect:
+    post:
+      summary: Collect events
+      description: Retrieve a list of events, according to the type requested, that occurred within the last day. Transmit can report events related to authentication and user management (cis), management apps and settings (admin), identity verifications (verify), and Fraud Prevention (risk).
+      operationId: collectEvents
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            enum: [cis, admin, verify, risk]
+          description: The event type to retrieve
+        - name: stream_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Event stream ID to collect events from
+        - name: batch_size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+          description: The maximum number of events to return
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/CisAuditLogEntry'
+                    - $ref: '#/components/schemas/AdminAuditLogEntry'
+                    - $ref: '#/components/schemas/RiskAuditLogEntry'
+                    - $ref: '#/components/schemas/VerifyAuditLogEntry'
+        401:
+          description: Unauthorized
+        404:
+          description: 'Stream not found.'
+        403:
+          description: 'Cannot handle request without performing start collect action first.'
+        406:
+          description: 'stream_id parameter is required and must be a continuous non-empty string.'
+        500:
+          description: Internal server error
+      security:
+        - oauth2: []
+  /activities/stop-collect:
+    delete:
+      summary: Stop collecting events
+      description: Stop collecting events and delete all event streams
+      operationId: StopCollectEvents
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            enum: [cis, admin, verify, risk]
+          description: The event type to stop collecting
+      responses:
+        200:
+          description: 'Stopped collecting \<TYPE\> events.'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: 'Cannot handle request without performing start collect action first.'
+        500:
+          description: Internal server error
+      security:
+        - oauth2: []
+
+
+components:
+  schemas:
+    UserAuditLogEntry:
+      type: object
+      required:
+        - activity
+        - app_id
+        - ip
+        - timestamp
+        - user_agent
+        - user_id
+      properties:
+        activity:
+          type: string
+          nullable: false
+          description: The activity performed by the user
+          example: "risk_recommendation"
+        app_id:
+          type: string
+          nullable: false
+          description: The unique ID of the application that generated the audit event
+          example: "Abt5xRVuE9bA4YFT9pQpC"
+        ip:
+          type: string
+          nullable: false
+          description: The IP address of the user
+          example: "1.1.1.1"
+        timestamp:
+          type: string
+          format: date-time
+          nullable: false
+          description: The date and time the event occurred (ISO 8601)
+          example: 2022-12-01T01:20:23.000Z
+        user_agent:
+          type: string
+          nullable: false
+          description: The user agent string of the user's device
+          example: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15"
+        user_id:
+          type: string
+          nullable: false
+          description: The unique ID of the user who performed the activity
+          example: "8XrdnAMJcMD8RhVMjDipa"
+    CisAuditLogEntry:
+      type: object
+      required:
+        - activity
+        - app_id
+        - ip
+        - timestamp
+        - user_agent
+        - user_id
+        - additionalParams
+      properties:
+        activity:
+          type: string
+          nullable: false
+          description: The activity performed by the user
+          example: "risk_recommendation"
+        app_id:
+          type: string
+          nullable: false
+          description: The unique ID of the application that generated the audit event
+          example: "Abt5xRVuE9bA4YFT9pQpC"
+        ip:
+          type: string
+          nullable: false
+          description: The IP address of the user
+          example: "1.1.1.1"
+        timestamp:
+          type: string
+          format: date-time
+          nullable: false
+          description: The date and time the event occurred (ISO 8601)
+          example: 2022-12-01T01:20:23.000Z
+        user_agent:
+          type: string
+          nullable: false
+          description: The user agent string of the user's device
+          example: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15"
+        user_id:
+          type: string
+          nullable: false
+          description: The unique ID of the user who performed the activity
+          example: "8XrdnAMJcMD8RhVMjDipa"
+        additionalParams:
+          type: object
+          nullable: false
+          description: The additional parameters of the cis activity
+          oneOf:
+            - $ref: '#/components/schemas/CreateUser'
+            - $ref: '#/components/schemas/GetUser'
+            - $ref: '#/components/schemas/GetUsers'
+            - $ref: '#/components/schemas/UpdateUser'
+            - $ref: '#/components/schemas/CreateUserFailure'
+    RiskAuditLogEntry:
+      type: object
+      required:
+        - activity
+        - app_id
+        - ip
+        - timestamp
+        - user_agent
+        - user_id
+        - additionalParams
+      properties:
+        activity:
+          type: string
+          nullable: false
+          description: The activity performed by the user
+          example: "risk_recommendation"
+        app_id:
+          type: string
+          nullable: false
+          description: The unique ID of the application that generated the audit event
+          example: "Abt5xRVuE9bA4YFT9pQpC"
+        ip:
+          type: string
+          nullable: false
+          description: The IP address of the user
+          example: "1.1.1.1"
+        timestamp:
+          type: string
+          format: date-time
+          nullable: false
+          description: The date and time the event occurred (ISO 8601)
+          example: 2022-12-01T01:20:23.000Z
+        user_agent:
+          type: string
+          nullable: false
+          description: The user agent string of the user's device
+          example: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15"
+        user_id:
+          type: string
+          nullable: false
+          description: The unique ID of the user who performed the activity
+          example: "8XrdnAMJcMD8RhVMjDipa"
+        additionalParams:
+          type: object
+          nullable: false
+          description: The additional parameters of the risk activity
+          oneOf:
+            - $ref: '#/components/schemas/RiskRecommendation'
+    VerifyAuditLogEntry:
+      type: object
+      required:
+        - activity
+        - app_id
+        - ip
+        - timestamp
+        - user_agent
+        - user_id
+        - additionalParams
+      properties:
+        activity:
+          type: string
+          nullable: false
+          description: The activity performed by the user
+          example: "risk_recommendation"
+        app_id:
+          type: string
+          nullable: false
+          description: The unique ID of the application that generated the audit event
+          example: "Abt5xRVuE9bA4YFT9pQpC"
+        ip:
+          type: string
+          nullable: false
+          description: The IP address of the user
+          example: "1.1.1.1"
+        timestamp:
+          type: string
+          format: date-time
+          nullable: false
+          description: The date and time the event occurred (ISO 8601)
+          example: 2022-12-01T01:20:23.000Z
+        user_agent:
+          type: string
+          nullable: false
+          description: The user agent string of the user's device
+          example: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15"
+        user_id:
+          type: string
+          nullable: false
+          description: The unique ID of the user who performed the activity
+          example: "8XrdnAMJcMD8RhVMjDipa"
+        additionalParams:
+          type: object
+          nullable: false
+          description: The additional parameters of the verify activity
+          oneOf:
+            - $ref: '#/components/schemas/VerificationStatusUpdated'
+            - $ref: '#/components/schemas/UserActionPerformed'
+            - $ref: '#/components/schemas/Redirect'
+            - $ref: '#/components/schemas/PageLoaded'
+            - $ref: '#/components/schemas/IDVError'
+            - $ref: '#/components/schemas/CheckImageQuality'
+            - $ref: '#/components/schemas/CheckImageQuality'
+    AdminAuditLogEntry:
+      type: object
+      required:
+        - activity
+        - actor_id
+        - actor_type
+        - ip
+        - timestamp
+        - user_agent
+      properties:
+        activity:
+          type: string
+          nullable: false
+          description: The activity performed by the actor
+          example: "admin_login"
+        actor_id:
+          type: string
+          nullable: false
+          description: The unique ID of the actor that performed the event
+          example: "I9ZHzI210K31O8CQpadIW"
+        actor_type:
+          type: string
+          enum:
+            - user
+            - app
+          nullable: false
+          description: The type of the actor
+          example: "user"
+        ip:
+          type: string
+          nullable: false
+          description: The IP address of the actor
+          example: "1.1.1.1"
+        target_resource_id:
+          type: string
+          nullable: false
+          description: The target resource affected by the activity
+          example: "admin-portal"
+        target_resource_type:
+          type: string
+          nullable: false
+          description: The type of the target resource affected by the activity
+          example: "app"
+          enum:
+            - user
+            - app
+            - tenant
+        timestamp:
+          type: string
+          format: date-time
+          nullable: false
+          description: The date and time the event occurred (ISO 8601)
+          example: 2022-12-01T01:20:23.000Z
+        user_agent:
+          type: string
+          nullable: false
+          description: The user agent string of the actor's device
+          example: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+        additionalParams:
+          type: object
+          nullable: false
+          description: The additional parameters of the risk activity
+          oneOf:
+            - $ref: '#/components/schemas/AdminUserSchema'
+    
+    CreateUserFailure:
+      type: object
+      properties:
+        email:
+          description: Email address of the user that failed to be created
+          type: string
+        external_user_id:
+          description: External system identifier for the user
+          type: string
+        failureType:
+          description: Type of failure that occurred during user creation
+          type: string
+        username:
+          description: Username of the user that failed to be created
+          type: string
+        status_code:
+          description: HTTP status code indicating the type of failure
+          type: string
+        x-correlation-id:
+          description: Unique identifier to track this failure across system components
+          type: string
+      additionalProperties: false
+    AdminUserSchema:
+      type: object
+      properties:
+        secondary_emails:
+          description: List of additional email addresses associated with the user
+          type: object
+          properties:
+            prev:
+              type: array
+              description: Previous values
+              items:
+                type: object
+                properties:
+                  value:
+                    description: The email address value
+                    type: string
+                  email_verified:
+                    description: Whether this email has been verified
+                    type: boolean
+                  verified_at:
+                    description: Timestamp when the email was verified
+                    type: string
+            current:
+              type: array
+              description: Current values
+              items:
+                type: object
+                properties:
+                  value:
+                    description: The email address value
+                    type: string
+                  email_verified:
+                    description: Whether this email has been verified
+                    type: boolean
+                  verified_at:
+                    description: Timestamp when the email was verified
+                    type: string
+        secondary_phone_numbers:
+          description: List of additional phone numbers associated with the user
+          type: object
+          properties:
+            prev:
+              type: array
+              description: Previous values
+              items:
+                type: object
+                properties:
+                  value:
+                    description: The phone number value
+                    type: string
+                  phone_number_verified:
+                    description: Whether this phone number has been verified
+                    type: boolean
+                  verified_at:
+                    description: Timestamp when the phone number was verified
+                    type: string
+            current:
+              type: array
+              description: Current values
+              items:
+                type: object
+                properties:
+                  value:
+                    description: The phone number value
+                    type: string
+                  phone_number_verified:
+                    description: Whether this phone number has been verified
+                    type: boolean
+                  verified_at:
+                    description: Timestamp when the phone number was verified
+                    type: string
+        birthday:
+          description: User's date of birth
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        address:
+          description: User's physical address details
+          type: object
+          properties:
+            prev:
+              type: object
+              description: Previous value
+              properties:
+                state:
+                  description: State/province/region
+                  type: string
+                country:
+                  description: Country name
+                  type: string
+                city:
+                  description: City name
+                  type: string
+                street_address:
+                  description: Street address including house/building number
+                  type: string
+                postal_code:
+                  description: ZIP or postal code
+                  type: string
+                type:
+                  description: Type of address (e.g. home, work)
+                  type: string
+              additionalProperties: false
+            current:
+              type: object
+              description: Current value
+              properties:
+                state:
+                  description: State/province/region
+                  type: string
+                country:
+                  description: Country name
+                  type: string
+                city:
+                  description: City name
+                  type: string
+                street_address:
+                  description: Street address including house/building number
+                  type: string
+                postal_code:
+                  description: ZIP or postal code
+                  type: string
+                type:
+                  description: Type of address (e.g. home, work)
+                  type: string
+              additionalProperties: false
+        name:
+          description: User's full name details
+          type: object
+          properties:
+            prev:
+              type: object
+              description: Previous value
+              properties:
+                title:
+                  description: Title/honorific (e.g. Mr., Mrs., Dr.)
+                  type: string
+                first_name:
+                  description: Given/first name
+                  type: string
+                last_name:
+                  description: Family/last name
+                  type: string
+                middle_name:
+                  description: Middle name
+                  type: string
+              additionalProperties: false
+            current:
+              type: object
+              description: Current value
+              properties:
+                title:
+                  description: Title/honorific (e.g. Mr., Mrs., Dr.)
+                  type: string
+                first_name:
+                  description: Given/first name
+                  type: string
+                last_name:
+                  description: Family/last name
+                  type: string
+                middle_name:
+                  description: Middle name
+                  type: string
+              additionalProperties: false
+        status:
+          description: Current status of the user account
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        external_account_id:
+          description: External system account identifier
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        picture:
+          description: URL to user's profile picture
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        language:
+          description: User's preferred language
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        external_user_id:
+          description: External system user identifier
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        username:
+          description: User's login username
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        email:
+          description: User's primary email address
+          type: object
+          properties:
+            prev:
+              type: object
+              description: Previous value
+              properties:
+                value:
+                  description: The email address value
+                  type: string
+                email_verified:
+                  description: Whether this email has been verified
+                  type: boolean
+                verified_at:
+                  description: Timestamp when the email was verified
+                  type: string
+              additionalProperties: false
+            current:
+              type: object
+              description: Current value
+              properties:
+                value:
+                  description: The email address value
+                  type: string
+                email_verified:
+                  description: Whether this email has been verified
+                  type: boolean
+                verified_at:
+                  description: Timestamp when the email was verified
+                  type: string
+              additionalProperties: false
+        phone_number:
+          description: User's primary phone number
+          type: object
+          properties:
+            prev:
+              type: object
+              description: Previous value
+              properties:
+                value:
+                  description: The phone number value
+                  type: string
+                phone_number_verified:
+                  description: Whether this phone number has been verified
+                  type: boolean
+                verified_at:
+                  description: Timestamp when the phone number was verified
+                  type: string
+              additionalProperties: false
+            current:
+              type: object
+              description: Current value
+              properties:
+                value:
+                  description: The phone number value
+                  type: string
+                phone_number_verified:
+                  description: Whether this phone number has been verified
+                  type: boolean
+                verified_at:
+                  description: Timestamp when the phone number was verified
+                  type: string
+              additionalProperties: false
+        custom_app_data:
+          description: Application-specific custom data
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        custom_data:
+          description: General custom data
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+      additionalProperties: false
+    CreateUser:
+      type: object
+      properties:
+        customDataUsed:
+          description: Indicates whether custom data was used during user creation
+          type: boolean
+      additionalProperties: false
+    GetUser:
+      type: object
+      properties:
+        getUserBy:
+          description: Parameter used to identify which user to retrieve (e.g. email, username, id)
+          type: string
+        customDataUsed:
+          description: Indicates whether custom data was used during user retrieval
+          type: boolean
+      additionalProperties: false  
+    GetUsers:
+      type: object
+      properties:
+        customDataUsed:
+          description: Indicates whether custom data was used during users retrieval
+          type: boolean
+      additionalProperties: false
+    RiskRecommendation:
+      type: object
+      properties:
+        actionId:
+          description: Unique identifier for the action being evaluated
+          type: string
+        actionType:
+          description: Type of action being performed (e.g. login, transaction)
+          type: string
+        clientId:
+          description: Identifier for the client/application making the request
+          type: string
+        correlationId:
+          description: Unique identifier to track this request across system components
+          type: string
+        deviceFingerprint:
+          description: Unique identifier generated from device characteristics
+          type: string
+        deviceId:
+          description: Unique identifier for the device
+          type: string
+        recommendation:
+          description: Recommended action based on risk assessment (e.g. allow, deny, challenge)
+          type: string
+        riskScore:
+          description: Numerical score indicating the level of risk (0-100)
+          type: number
+        location:
+          description: Geographic location of the request
+          type: string
+        ipCountry:
+          description: Country derived from IP address
+          type: string
+        ipAsnName:
+          description: Name of the Autonomous System Network
+          type: string
+        osName:
+          description: Operating system name of the device
+          type: string
+        browserName:
+          description: Web browser name used for the request
+          type: string
+        ipRegion:
+          description: Region/state derived from IP address
+          type: string
+        ipLocationCity:
+          description: City derived from IP address
+          type: string
+        ipLocationZip:
+          description: Postal/ZIP code derived from IP address
+          type: string
+        ipLocationLatitude:
+          description: Latitude coordinate derived from IP address
+          type: string
+        ipLocationLongitude:
+          description: Longitude coordinate derived from IP address
+          type: string
+        ipLocationTimezone:
+          description: Timezone derived from IP address
+          type: string
+        ipOrganizationName:
+          description: Name of the organization owning the IP address
+          type: string
+        ipOrganizationType:
+          description: Type of organization owning the IP address
+          type: string
+        deviceTimezone:
+          description: Timezone reported by the device
+          type: string
+        deviceLanguages:
+          description: List of languages configured on the device
+          type: array
+          items:
+            type: string
+        devicePlatform:
+          description: Platform/environment of the device
+          type: string
+        sdkVersion:
+          description: Version of the SDK used to collect device information
+          type: string
+        appVersion:
+          description: Version of the application making the request
+          type: string
+        ipAsnId:
+          description: Identifier of the Autonomous System Network
+          type: string
+        campaignId:
+          description: Identifier for the marketing or fraud campaign
+          type: string
+        reasons:
+          description: List of reasons contributing to the risk assessment
+          type: array
+          items:
+            type: string
+        signals:
+          description: Collection of risk signals from different categories
+          type: object
+          properties:
+            device:
+              description: Signals related to device characteristics
+              type: object
+              properties:
+                incognito:
+                  description: Whether the browser is in incognito/private mode
+                  type: boolean
+                tampered:
+                  description: Whether device shows signs of tampering
+                  type: boolean
+                emulated:
+                  description: Whether device appears to be emulated
+                  type: boolean
+                spoofed:
+                  description: Whether device characteristics appear to be spoofed
+                  type: boolean
+                tzMismatch:
+                  description: Whether there's a mismatch in timezone information
+                  type: boolean
+            network:
+              description: Signals related to network characteristics
+              type: object
+              properties:
+                tor:
+                  description: Whether the request is coming through Tor network
+                  type: boolean
+                proxy:
+                  description: Whether the request is coming through a proxy
+                  type: boolean
+                anonymizer:
+                  description: Whether an anonymizing service is detected
+                  type: boolean
+            behavioral:
+              description: Signals related to user behavior
+              type: object
+              properties:
+                typingVelocity:
+                  description: Measured typing speed of the user
+                  type: number
+                noUserInteraction:
+                  description: Whether there was no natural user interaction
+                  type: boolean
+                inputMethod:
+                  description: Method used for input (e.g. keyboard, paste, automation)
+                  type: string
+            history:
+              description: Signals related to historical patterns
+              type: object
+              properties:
+                deviceActionRate60Sec:
+                  description: Rate of actions from this device in last 60 seconds
+                  type: number
+                ipActionRate60Sec:
+                  description: Rate of actions from this IP in last 60 seconds
+                  type: number
+                ipDeviceCountLastHour:
+                  description: Number of devices using this IP in last hour
+                  type: number
+                ipUserCountLastHour:
+                  description: Number of users from this IP in last hour
+                  type: number
+                linkingDeviceToUsersCount:
+                  description: Number of users associated with this device
+                  type: number
+                linkingUserToDeviceCount:
+                  description: Number of devices associated with this user
+                  type: number
+                userActionRate60Sec:
+                  description: Rate of actions from this user in last 60 seconds
+                  type: number
+      additionalProperties: false
+    UpdateUser:
+      type: object
+      properties:
+        secondary_emails:
+          description: List of additional email addresses associated with the user
+          type: object
+          properties:
+            prev:
+              type: array
+              description: Previous values
+              items:
+                type: object
+                properties:
+                  value:
+                    description: The email address value
+                    type: string
+                  email_verified:
+                    description: Whether this email has been verified
+                    type: boolean
+                  verified_at:
+                    description: Timestamp when the email was verified
+                    type: string
+            current:
+              type: array
+              description: Current values
+              items:
+                type: object
+                properties:
+                  value:
+                    description: The email address value
+                    type: string
+                  email_verified:
+                    description: Whether this email has been verified
+                    type: boolean
+                  verified_at:
+                    description: Timestamp when the email was verified
+                    type: string
+        secondary_phone_numbers:
+          description: List of additional phone numbers associated with the user
+          type: object
+          properties:
+            prev:
+              type: array
+              description: Previous values
+              items:
+                type: object
+                properties:
+                  value:
+                    description: The phone number value
+                    type: string
+                  phone_number_verified:
+                    description: Whether this phone number has been verified
+                    type: boolean
+                  verified_at:
+                    description: Timestamp when the phone number was verified
+                    type: string
+            current:
+              type: array
+              description: Current values
+              items:
+                type: object
+                properties:
+                  value:
+                    description: The phone number value
+                    type: string
+                  phone_number_verified:
+                    description: Whether this phone number has been verified
+                    type: boolean
+                  verified_at:
+                    description: Timestamp when the phone number was verified
+                    type: string
+        birthday:
+          description: User's date of birth
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        address:
+          description: User's physical address details
+          type: object
+          properties:
+            prev:
+              type: object
+              description: Previous value
+              properties:
+                state:
+                  description: State/province/region
+                  type: string
+                country:
+                  description: Country name
+                  type: string
+                city:
+                  description: City name
+                  type: string
+                street_address:
+                  description: Street address including house/building number
+                  type: string
+                postal_code:
+                  description: ZIP or postal code
+                  type: string
+                type:
+                  description: Type of address (e.g. home, work)
+                  type: string
+              additionalProperties: false
+            current:
+              type: object
+              description: Current value
+              properties:
+                country:
+                  description: Country name
+                  type: string
+                state:
+                  description: State/province/region
+                  type: string
+                city:
+                  description: City name
+                  type: string
+                street_address:
+                  description: Street address including house/building number
+                  type: string
+                postal_code:
+                  description: ZIP or postal code
+                  type: string
+                type:
+                  description: Type of address (e.g. home, work)
+                  type: string
+              additionalProperties: false
+        name:
+          description: User's full name details
+          type: object
+          properties:
+            prev:
+              type: object
+              description: Previous value
+              properties:
+                title:
+                  description: Title/honorific (e.g. Mr., Mrs., Dr.)
+                  type: string
+                first_name:
+                  description: Given/first name
+                  type: string
+                last_name:
+                  description: Family/last name
+                  type: string
+                middle_name:
+                  description: Middle name
+                  type: string
+              additionalProperties: false
+            current:
+              type: object
+              description: Current value
+              properties:
+                title:
+                  description: Title/honorific (e.g. Mr., Mrs., Dr.)
+                  type: string
+                first_name:
+                  description: Given/first name
+                  type: string
+                last_name:
+                  description: Family/last name
+                  type: string
+                middle_name:
+                  description: Middle name
+                  type: string
+              additionalProperties: false
+        status:
+          description: Current status of the user account
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        external_account_id:
+          description: External system account identifier
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        picture:
+          description: URL to user's profile picture
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        language:
+          description: User's preferred language
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        external_user_id:
+          description: External system user identifier
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        username:
+          description: User's login username
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        email:
+          description: User's primary email address
+          type: object
+          properties:
+            prev:
+              type: object
+              description: Previous value
+              properties:
+                value:
+                  description: The email address value
+                  type: string
+                email_verified:
+                  description: Whether this email has been verified
+                  type: boolean
+                verified_at:
+                  description: Timestamp when the email was verified
+                  type: string
+              additionalProperties: false
+            current:
+              type: object
+              description: Current value
+              properties:
+                value:
+                  description: The email address value
+                  type: string
+                email_verified:
+                  description: Whether this email has been verified
+                  type: boolean
+                verified_at:
+                  description: Timestamp when the email was verified
+                  type: string
+              additionalProperties: false
+        phone_number:
+          description: User's primary phone number
+          type: object
+          properties:
+            prev:
+              type: object
+              description: Previous value
+              properties:
+                value:
+                  description: The phone number value
+                  type: string
+                phone_number_verified:
+                  description: Whether this phone number has been verified
+                  type: boolean
+                verified_at:
+                  description: Timestamp when the phone number was verified
+                  type: string
+              additionalProperties: false
+            current:
+              type: object
+              description: Current value
+              properties:
+                value:
+                  description: The phone number value
+                  type: string
+                phone_number_verified:
+                  description: Whether this phone number has been verified
+                  type: boolean
+                verified_at:
+                  description: Timestamp when the phone number was verified
+                  type: string
+              additionalProperties: false
+        custom_app_data:
+          description: Application-specific custom data
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        custom_data:
+          description: General custom data
+          type: object
+          properties:
+            prev:
+              type: string
+              description: Previous value
+            current:
+              type: string
+              description: Current value
+        customDataUsed:
+          description: Indicates whether custom data was used during user update
+          type: boolean
+      additionalProperties: false    
+    VerificationStatusUpdated:
+      type: object
+      properties:
+        sessionId:
+          description: Unique identifier for the verification status session
+          type: string 
+        result:
+          description: Result of the verification status update
+          type: string   
+      additionalProperties: false
+    UserActionPerformed:
+      type: object
+      properties:
+        sessionId:
+          description: Unique identifier for the user action session
+          type: string
+        sdkVersion:
+          description: Version of the SDK used during the user action
+          type: string
+        browser:
+          description: Web browser used when the user action occurred
+          type: string
+        osVersion:
+          description: Operating system version of the device
+          type: string
+        platform:
+          description: Platform/environment where the user action occurred
+          type: string
+        deviceModel:
+          description: Model name/number of the device
+          type: string
+        userActionType:
+          description: Type or name of the user action that was performed
+          type: string  
+        pageName:
+          description: Name or identifier of the page where the action occurred
+          type: string    
+      additionalProperties: false
+    Redirect:
+      type: object
+      properties:
+        sessionId:
+          description: Unique identifier for the redirect session
+          type: string
+        sdkVersion:
+          description: Version of the SDK used during redirect
+          type: string
+        browser:
+          description: Web browser used during the redirect
+          type: string
+        osVersion:
+          description: Operating system version of the device
+          type: string
+        platform:
+          description: Platform/environment where the redirect occurred
+          type: string
+        deviceModel:
+          description: Model name/number of the device
+          type: string
+        redirectUrl:
+          description: URL where the user is being redirected to
+          type: string
+      additionalProperties: false
+    PageLoaded:
+      type: object
+      properties:
+        sessionId:
+          description: Unique identifier for the page load session
+          type: string
+        sdkVersion:
+          description: Version of the SDK used during page load
+          type: string
+        browser:
+          description: Web browser used to load the page
+          type: string
+        osVersion:
+          description: Operating system version of the device
+          type: string
+        platform:
+          description: Platform/environment where the page was loaded
+          type: string
+        deviceModel:
+          description: Model name/number of the device
+          type: string
+        pageName:
+          description: Name or identifier of the page that was loaded
+          type: string
+      additionalProperties: false
+    ImageUploadedInfo:
+      type: object
+      properties:
+        sessionId:
+          description: Unique identifier for the image upload session
+          type: string
+        sdkVersion:
+          description: Version of the SDK used to capture and upload the image
+          type: string
+        browser:
+          description: Web browser used during the image upload
+          type: string
+        osVersion:
+          description: Operating system version of the device
+          type: string
+        platform:
+          description: Platform/environment where the image was uploaded from
+          type: string
+        deviceModel:
+          description: Model name/number of the device used for upload
+          type: string
+        imageType:
+          description: Type of image being uploaded (e.g. document, selfie)
+          type: string
+        processResult:
+          description: Result of the image processing operation
+          type: string
+        requestProcessingTimeMs:
+          description: Time taken to process the image upload request in milliseconds
+          type: integer
+      additionalProperties: false
+    IDVError:
+      type: object
+      properties:
+        sessionId:
+          description: Unique identifier for the error session
+          type: string
+        sdkVersion:
+          description: Version of the SDK where the error occurred
+          type: string
+        browser:
+          description: Web browser used when the error occurred
+          type: string
+        osVersion:
+          description: Operating system version of the device
+          type: string
+        platform:
+          description: Platform/environment where the error occurred
+          type: string
+        deviceModel:
+          description: Model name/number of the device
+          type: string    
+        errorName:
+          description: Name or type of the error that occurred
+          type: string
+        errorDescription:
+          description: Detailed description of the error
+          type: string  
+      additionalProperties: false
+    CheckImageQuality:
+      type: object
+      properties:
+        sessionId:
+          description: Unique identifier for the image quality check session
+          type: string
+        sdkVersion:
+          description: Version of the SDK used to capture and check the image
+          type: string
+        browser:
+          description: Web browser used during the image capture
+          type: string
+        osVersion:
+          description: Operating system version of the device
+          type: string
+        platform:
+          description: Platform/environment where the image was captured
+          type: string
+        deviceModel:
+          description: Model name/number of the device used for capture
+          type: string    
+        imageType:
+          description: Type of image being checked (e.g. document, selfie)
+          type: string
+      additionalProperties: false
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: A token generated by the application using the [token endpoint](/openapi/token/#operation/getAccessToken).
+      flows:
+        clientCredentials:
+          tokenUrl: /oidc/token
+          scopes: {}

@@ -1,0 +1,240 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Sessions",
+    "description": "Manage user sessions that are created upon successful 'frontend' authentication. This does not apply to the methods implemented via a backend-to-backend integration (under 'Backend Authentication').",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/sessions/{user_id}": {
+      "get": {
+        "operationId": "getUserSessions",
+        "summary": "Get user sessions",
+        "description": "Retrieves all active sessions for a specified user. <br><br>**Required permissions**: `apps:read`, `[appId]:read`, `sessions:read`.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the user to get active sessions for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteUserSessions",
+        "summary": "Revoke sessions",
+        "description": "Revokes all refresh tokens and logs out of all sessions for a specified user. <br><br>**Required permissions**: `apps:delete`, `[appId]:delete`, `sessions:delete`.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the user to revoke sessions for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiRevokeSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BadRequestHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "example": "Bad request",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_code": {
+            "type": "number",
+            "example": 400
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "SessionResponse": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "User ID"
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Session ID"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "Client ID"
+          },
+          "start_time": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Session creation time"
+          },
+          "expiration_time": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Session expiration time"
+          }
+        },
+        "required": [
+          "user_id",
+          "session_id",
+          "client_id",
+          "start_time",
+          "expiration_time"
+        ]
+      },
+      "ApiRevokeSessionResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/ApiRevokeSession"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "ApiRevokeSession": {
+        "type": "object",
+        "properties": {
+          "deleted_count": {
+            "type": "number",
+            "description": "Number of sessions that were deleted"
+          }
+        },
+        "required": [
+          "deleted_count"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

@@ -1,0 +1,176 @@
+openapi: 3.1.0
+info:
+  title: API reference
+  description: This includes tsmim client APIs for Transmit's Machine Identity Management services. The `tsmim` component acts as a side-car server running on localhost. Workloads can invoke these APIs over local http calls to communicate with our Machine Identity Provider.
+  version: ''
+servers:
+  - url: https://localhost:{port}/peer
+    description: tsmim local API server, port is configurable with default of 3013
+    variables:
+      port:
+        enum:
+          - '3013'
+        default: '3013'
+security:
+  - bearerAuth: []
+paths:
+  /v1/workload/id:
+    get:
+      summary: Get workload ID
+      description: Retrieves the Workload ID of tsmim client after it authenticated with a valid ticket. The ID can be used for tracking in the Admin Console.
+      operationId: getWorkloadID
+      responses:
+        '200':
+          description: Workload ID Retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: string
+                    description: Workload ID of an authenticated tsmim client
+  /v1/secret/{id}:
+    get:
+      summary: Get secret
+      description: Retrieves a single Secret by its ID. Secrets can be managed in the Admin Console
+      operationId: getSecret
+      parameters:
+        - name: id
+          in: path
+          description: Secret ID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: force_refresh
+          description: Retrieved secrets might be cached in memory for performance. Setting this property to true will ignore the cache and fetch again the secret from its source
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Secret Retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Secret'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/id_token:
+    get:
+      summary: Get ID Token
+      description: Provides a signed JWT ID token that can be added to a HTTP request header (e.g. in Authorization header as "Bearer jwt_id_token". The receiver of the request can validate the header using standard JWKS
+      operationId: getJWTIdToken
+      responses:
+        '200':
+          description: ID Token Retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - jwt_id_token
+                properties:
+                  jwt_id_token:
+                    type: string
+                    description: A valid JWT ID token signed by MIM IdP
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/generate/invite:
+    post:
+      summary: Generate invite
+      description: Generates an invite code (Ticket). This is a privileged control plane operation, which can be invoked only by workloads assigned with the "Orchestrator" role. Other workloads can use the generated invite in order to enroll and authenticate.
+      operationId: generateInvite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ticket_factory_id
+              properties:
+                ticket_factory_id:
+                  type: string
+                  description: Ticket Factory ID that will be used to generate the invite Ticket
+      responses:
+        '200':
+          description: Invite Ticket Generated
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ticket_id
+                properties:
+                  ticket_id:
+                    type: string
+                    description: An invite Ticket for authenticating with MIM IdP
+        '400':
+          $ref: '#/components/responses/BadRequest'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: MIM_API_KEY
+  schemas:
+    Secret:
+      type: object
+      required:
+        - id
+        - content
+        - created_at
+        - expires_at
+        - description
+      properties:
+        id:
+          type: string
+          description: Secret ID
+        content:
+          type: string
+          description: Content of the Secret
+        created_at:
+          type: string
+          format: date-time
+          description: Date secret was first recorded, ISO 8601
+        expires_at:
+          type: string
+          format: date-time
+          description: Date secret is set to expire, ISO 8601
+        description:
+          type: string
+          description: Description of the secret
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - code
+              - message
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - code
+              - message
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string

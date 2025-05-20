@@ -1,0 +1,9 @@
+# Overview
+
+As national administrations around the world are enforcing laws to protect user privacy, companies are increasingly focusing on safeguarding users against account takeover. Consequently, it has become crucial to abandon easy-to-tamper authentication methods like passwords and transition towards passwordless authentication solutions, which may include methods like biometrics or facial recognition. With passwordless authentication solutions, login is faster, easier, and significantly more secure as you can be confident that users are indeed who they claim to be.
+
+## Mosaic hosted passwordless login
+
+To facilitate their clients' transition to passwordless authentication, AWS Cognito (for B2B) and Azure (for B2C), both exclusively offering password-based authentication, have partnered with Mosaic. This collaboration integrates passwordless authentication based on WebAuthn, leveraging the latest FIDO Alliance standards, including [FIDO2 biometrics](https://fidoalliance.org/fido2/), the latest set of passwordless standards by the FIDO Alliance. If your application relies on either AWS Cognito or Azure as an IDP, you can now seamlessly incorporate Mosaic's one-step passwordless authentication.
+
+ This solution requires end-users to register a single account with your business and then log in with a fingerprint or facial biometric on any channel and any device. As a result, in the long term you'll manage to eliminate any other data that could expose your users to attacks. Our unique device-binding method makes it easy and secure for end-users to transfer trust to any of their devices, binding them all to one unified identity.

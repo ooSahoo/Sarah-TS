@@ -1,0 +1,913 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "One-Time Login",
+    "description": "Login users using one-time login methods like magic links or OTPs. This implements a frontend integration for authentication, where the client obtains an authorization code that your app can exchange in the backend for user tokens.",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/auth/links/email": {
+      "post": {
+        "operationId": "SendEmail",
+        "summary": "Send email link",
+        "description": "Send a magic link by email to a user. <br><br>**Required permissions**: `apps:execute`, `[appId]:execute`, `auth:execute`.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSendLoginEmailInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSendEmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/otp/email": {
+      "post": {
+        "operationId": "sendEmailOtp",
+        "summary": "Send email OTP",
+        "description": "Send a one-time passcode (OTP) by email to the given email address. <br><br>**Required permissions**: `apps:execute`, `[appId]:execute`, `auth:execute`.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSendOtpEmailRequestInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSendOtpEmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/otp/email/validation": {
+      "post": {
+        "operationId": "validateEmailOtp",
+        "summary": "Validate email OTP",
+        "description": "Validate a one-time passcode sent by email to a user. The endpoint will return a URI which can be used to redirect the client in order to complete authentication. <br><br>**Required permissions**: `apps:execute`, `[appId]:execute`, `auth:execute`.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiValidateAuthEmailOtpInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedirectUriResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/otp/sms": {
+      "post": {
+        "operationId": "sendSmsOtp",
+        "summary": "Send SMS OTP",
+        "description": "Send a one-time passcode (OTP) by SMS to the given phone number. <br><br>**Required permissions**: `apps:execute`, `[appId]:execute`, `auth:execute`.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiSendAuthSmsOtpInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiSendAuthSmsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/otp/sms/validation": {
+      "post": {
+        "operationId": "validateSms",
+        "summary": "Validate SMS OTP",
+        "description": "Validate a one-time passcode sent by SMS to a user. The endpoint will return a URI which can be used to redirect the client in order to complete authentication. <br><br>**Required permissions**: `apps:execute`, `[appId]:execute`, `auth:execute`.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiValidateAuthSmsOtpInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedirectUriResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/token": {
+      "post": {
+        "operationId": "tokenExchange",
+        "summary": "Exchange code for token",
+        "description": "Retrieve ID and access tokens. This API is used to retrieve ID and access tokens using the code that was returned in the redirect URI as a query parameter (for example, when the user clicks a magic link). It may also create a new user if create_new_user was set to true in the send request and no user exists for the email address or phone number (depending on the flow).",
+        "deprecated": true,
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiTokenExchangeRequestInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiTokenExchangeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "summary": "Logout",
+        "description": "Logout the user from a specific session. The user and session are derived from the access token used to authorize the request (which was issued based on the authentication that created the session)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sessions deleted Successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiLogoutResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestException"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiLogoutResponse": {
+        "type": "object",
+        "properties": {
+          "sessions_count": {
+            "type": "number",
+            "description": "Number of logged out sessions"
+          }
+        },
+        "required": [
+          "sessions_count"
+        ]
+      },
+      "BadRequestException": {
+        "type": "object",
+        "properties": {}
+      },
+      "InvalidTokenHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Invalid token"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 401
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiTokenExchangeRequestInput": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Authorization code returned in the redirect URI as a query parameter upon successful authentication",
+            "example": "GZxLFKTDCnlANVTxNvaWz7AIGPpXqZYSXdAwjiWRuOH"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "Client ID of the application requesting the token",
+            "example": "DgsdfhSDsdfhtSDFXCCXBVMKPws345yscv2345XCZV",
+            "maxLength": 50
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "Client Secret of the application requesting the token",
+            "example": "FzxvdDMbvxnc45sdfb789XCVGEW6usazxcvbw3KPsb23",
+            "maxLength": 50
+          }
+        },
+        "required": [
+          "code",
+          "client_id",
+          "client_secret"
+        ]
+      },
+      "ApiTokenExchangeResponse": {
+        "type": "object",
+        "properties": {
+          "id_token": {
+            "type": "string"
+          },
+          "access_token": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          },
+          "is_user_created": {
+            "type": "boolean",
+            "description": "Indicates if this is a new user or not"
+          }
+        },
+        "required": [
+          "id_token",
+          "access_token",
+          "refresh_token",
+          "is_user_created"
+        ]
+      },
+      "BadRequestHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "example": "Bad request",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_code": {
+            "type": "number",
+            "example": 400
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiSendLoginEmailInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "name@example.com",
+            "description": "Email of the user"
+          },
+          "redirect_uri": {
+            "type": "string",
+            "example": "https://www.example.com/verify",
+            "description": "URI that will receive the authorization code. This is the server GET endpoint used to call the token endpoint, and should accept 'code' as a query parameter. This URI must also be configured as an allowed redirect URI in the Transmit Admin Portal."
+          },
+          "create_new_user": {
+            "type": "boolean",
+            "example": false,
+            "description": "Indicates whether to create a new user at the end of the authentication flow if a user is not found for the provided email. If enabled, public signups must also be configured as allowed for the application.",
+            "default": false
+          },
+          "resource": {
+            "type": "string",
+            "description": "URI of the resource the request is attempting to access, which is reflected in the audience (aud claim) of the access token. This must be configured as resource for the application."
+          },
+          "email_content": {
+            "description": "Texts, logo and color to render email template with",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailContentAttributes"
+              }
+            ]
+          },
+          "require_mfa": {
+            "type": "boolean",
+            "example": true,
+            "description": "Require multi factor authentication for this authentication request.",
+            "default": false
+          },
+          "claims": {
+            "type": "object",
+            "example": {
+              "id_token": {
+                "roles": null
+              }
+            },
+            "description": "Used to request additional claims in the ID token, such as roles, permissions, and other user profile data. The structure is per the [OIDC Standard](https://openid.net/specs/openid-connect-core-1_0-final.html#ClaimsParameter). For supported claims and how to request custom claims, see the [ID Token Reference](https://developer.transmitsecurity.com/openapi/id_token_reference/)."
+          },
+          "client_attributes": {
+            "description": "Client attributes",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientAttributes"
+              }
+            ]
+          },
+          "org_id": {
+            "type": "string",
+            "description": "Organization ID, used for member login in B2B scenarios"
+          }
+        },
+        "required": [
+          "email",
+          "redirect_uri"
+        ]
+      },
+      "ApiSendEmailResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Email sent successfully"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "NotFoundHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 404
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiSendOtpEmailRequestInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "name@example.com",
+            "description": "Email of the user"
+          },
+          "redirect_uri": {
+            "type": "string",
+            "example": "https://www.example.com/verify",
+            "description": "URI that will receive the authorization code. This is the server GET endpoint used to call the token endpoint, and should accept 'code' as a query parameter. This URI must also be configured as an allowed redirect URI in the Transmit Admin Portal."
+          },
+          "create_new_user": {
+            "type": "boolean",
+            "example": false,
+            "description": "Indicates whether to create a new user at the end of the authentication flow if a user is not found for the provided email. If enabled, public signups must also be configured as allowed for the application.",
+            "default": false
+          },
+          "resource": {
+            "type": "string",
+            "description": "URI of the resource the request is attempting to access, which is reflected in the audience (aud claim) of the access token. This must be configured as resource for the application."
+          },
+          "email_content": {
+            "description": "Texts, logo and color to render email template with",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailContentAttributes"
+              }
+            ]
+          },
+          "require_mfa": {
+            "type": "boolean",
+            "example": true,
+            "description": "Require multi factor authentication for this authentication request.",
+            "default": false
+          },
+          "claims": {
+            "type": "object",
+            "example": {
+              "id_token": {
+                "roles": null
+              }
+            },
+            "description": "Used to request additional claims in the ID token, such as roles, permissions, and other user profile data. The structure is per the [OIDC Standard](https://openid.net/specs/openid-connect-core-1_0-final.html#ClaimsParameter). For supported claims and how to request custom claims, see the [ID Token Reference](https://developer.transmitsecurity.com/openapi/id_token_reference/)."
+          },
+          "client_attributes": {
+            "description": "Client attributes",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientAttributes"
+              }
+            ]
+          },
+          "org_id": {
+            "type": "string",
+            "description": "Organization ID, used for member login in B2B scenarios"
+          },
+          "approval_data": {
+            "type": "object",
+            "example": {
+              "transaction_id": "eFII2y40uB9hQ98nXt3tc1IHkRt8GrRZiqZuRn_59wT",
+              "sum": "200"
+            },
+            "description": "Flat object that contains the data that your customer should approve for a transaction signing or custom approval flow. It can contain up to 10 keys, and only alphanumeric characters, underscores, hyphens, and periods. It will be returned as a claim in the ID token upon successful authentication."
+          }
+        },
+        "required": [
+          "email",
+          "redirect_uri"
+        ]
+      },
+      "ApiSendOtpEmailResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "readOnly": true,
+            "example": "OTP email sent"
+          },
+          "approval_data": {
+            "type": "object",
+            "readOnly": true,
+            "example": {
+              "transaction_id": "eFII2y40uB9hQ98nXt3tc1IHkRt8GrRZiqZuRn_59wT",
+              "sum": "200"
+            },
+            "description": "Approval data object, if passed in the request."
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ApiValidateAuthEmailOtpInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email that the OTP was sent to"
+          },
+          "passcode": {
+            "type": "string",
+            "description": "Email code to validate"
+          },
+          "response_type": {
+            "type": "string",
+            "description": "Response type requested for the authentication flow.",
+            "default": "code",
+            "enum": [
+              "code",
+              "id_token"
+            ]
+          },
+          "nonce": {
+            "type": "string",
+            "description": "A random value that will associate the client request with the ID token, and used to mitigate replay attacks. It will be added to the ID token and the backend service should only accept ID tokens that include the same nonce value as the one included in the original request."
+          }
+        },
+        "required": [
+          "email",
+          "passcode"
+        ]
+      },
+      "RedirectUriResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string",
+            "readOnly": true,
+            "description": "URI used to complete the flow. Sending a GET request to this URI will redirect the browser to your redirect URI with a code to exchange for user tokens."
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "ApiSendAuthSmsOtpInput": {
+        "type": "object",
+        "properties": {
+          "custom_message": {
+            "type": "string",
+            "description": "Message to send, must contain {otp} and {app} placeholders to be replaced with one time password and application name. Limited to 140 characters"
+          },
+          "sender_id": {
+            "type": "string",
+            "description": "The sender name that appears as the message sender on recipients devices. Limited to 11 characters. Limited support see https://docs.aws.amazon.com/sns/latest/dg/sns-supported-regions-countries.html"
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "Phone number to send the OTP to"
+          },
+          "create_new_user": {
+            "type": "boolean",
+            "description": "Indicates whether to create a new user at the end of the authentication flow if a user is not found for the provided phone number. If enabled, public signups must also be configured as allowed for the application.",
+            "default": false
+          },
+          "redirect_uri": {
+            "type": "string",
+            "description": "URI that will receive the authorization code once the SMS OTP is validated. This is the server GET endpoint used to call the token endpoint, and should accept 'code' as a query parameter. This URI must also be configured as an allowed redirect URI in the Transmit Admin Portal"
+          },
+          "require_mfa": {
+            "type": "boolean",
+            "example": true,
+            "default": false,
+            "description": "Require multi factor authentication for this authentication request."
+          },
+          "claims": {
+            "type": "object",
+            "example": {
+              "id_token": {
+                "roles": null
+              }
+            },
+            "description": "Used to request additional claims in the ID token, such as roles, permissions, and other user profile data. The structure is per the [OIDC Standard](https://openid.net/specs/openid-connect-core-1_0-final.html#ClaimsParameter). For supported claims and how to request custom claims, see the [ID Token Reference](https://developer.transmitsecurity.com/openapi/id_token_reference/)."
+          },
+          "approval_data": {
+            "type": "object",
+            "example": {
+              "transaction_id": "eFII2y40uB9hQ98nXt3tc1IHkRt8GrRZiqZuRn_59wT",
+              "sum": "200"
+            },
+            "description": "Flat object that contains the data that your customer should approve for a transaction signing or custom approval flow. It can contain up to 10 keys, and only alphanumeric characters, underscores, hyphens, and periods. It will be returned as a claim in the ID token upon successful authentication."
+          },
+          "org_id": {
+            "type": "string",
+            "description": "Organization ID, used for member login in B2B scenarios"
+          }
+        },
+        "required": [
+          "phone_number",
+          "create_new_user",
+          "redirect_uri"
+        ]
+      },
+      "ApiSendAuthSmsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "readOnly": true,
+            "example": "SMS sent"
+          },
+          "approval_data": {
+            "type": "object",
+            "readOnly": true,
+            "example": {
+              "transaction_id": "eFII2y40uB9hQ98nXt3tc1IHkRt8GrRZiqZuRn_59wT",
+              "sum": "200"
+            },
+            "description": "Approval data object, if passed in the request."
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ApiValidateAuthSmsOtpInput": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string",
+            "description": "Phone number that the SMS OTP was sent to"
+          },
+          "passcode": {
+            "type": "string",
+            "description": "OTP to validate"
+          },
+          "response_type": {
+            "type": "string",
+            "description": "Response type requested for the authentication flow.",
+            "default": "code",
+            "enum": [
+              "code",
+              "id_token"
+            ]
+          },
+          "nonce": {
+            "type": "string",
+            "description": "A random value that will associate the client request with the ID token, and used to mitigate replay attacks. It will be added to the ID token and the backend service should only accept ID tokens that include the same nonce value as the one included in the original request."
+          }
+        },
+        "required": [
+          "phone_number",
+          "passcode"
+        ]
+      },
+      "EmailContentAttributes": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "The subject of the email"
+          },
+          "primaryColor": {
+            "type": "string",
+            "example": "#6981FF",
+            "description": "Primary color of the email, specified as a Hex color"
+          },
+          "base64logo": {
+            "type": "string",
+            "description": "Base64 encoded image for email logo. The string length must be less than or equal to 20000 characters"
+          },
+          "headerText": {
+            "type": "string",
+            "description": "The header of the email"
+          },
+          "bodyText": {
+            "type": "string",
+            "description": "The body of the email"
+          },
+          "linkText": {
+            "type": "string",
+            "description": "The text of the link button in the email"
+          },
+          "infoText": {
+            "type": "string",
+            "description": "Any extra information in the email"
+          },
+          "footerText": {
+            "type": "string",
+            "example": "If you didn't request this email, you can safely ignore it.",
+            "description": "The footer of the email"
+          },
+          "senderName": {
+            "type": "string",
+            "description": "Name of the sender of the email"
+          }
+        },
+        "required": [
+          "subject"
+        ]
+      },
+      "ClientAttributes": {
+        "type": "object",
+        "properties": {
+          "user_agent": {
+            "type": "string"
+          },
+          "ip_address": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

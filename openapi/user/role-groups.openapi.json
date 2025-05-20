@@ -1,0 +1,496 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Role Groups",
+    "description": "Roles can be organized into groups so you can more easily control access to your application. For example, you can add a role group to an organization for B2B scenarios so that their members can only be assigned roles that belong to this group. These APIs allow you to manage the role groups for your application. You can then use the [Organizations APIs](/openapi/user/organizations/) to add the relevant role groups to each organization and the [Members API](/openapi/user/members/) can be used to assign roles to their members.",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/applications/{app_id}/role-groups": {
+      "post": {
+        "operationId": "createRoleGroup",
+        "summary": "Create role group",
+        "description": "Create a new role group for this application. <br><br>**Required permissions**: `organizations:create`, `roles:create`.",
+        "parameters": [
+          {
+            "name": "app_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the application to create the role group in",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiCreateRolesGroup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentifierIsTakenHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminAccessToken": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAppRoleGroups",
+        "summary": "Get role groups",
+        "description": "Retrieve a list of all role groups created for this application. <br><br>**Required permissions**: `organizations:read`, `roles:read`, `organizations:list`, `roles:list`, `orgs:read`.",
+        "parameters": [
+          {
+            "name": "app_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the application to retrieve it's role groups",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getAppRoleGroups",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ApiRoleGroup"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/applications/{app_id}/role-groups/{group_id}": {
+      "put": {
+        "operationId": "updateRoleGroup",
+        "summary": "Update role group",
+        "description": "Update an existing role group for this application. <br><br>**Required permissions**: `organizations:edit`, `roles:edit`.",
+        "parameters": [
+          {
+            "name": "app_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the application the group is in",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the group to set the roles to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiUpdateRolesGroup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentifierIsTakenHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminAccessToken": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteRoleGroup",
+        "summary": "Delete role group",
+        "description": "Delete role group. <br><br>**Required permissions**: `organizations:delete`, `roles:delete`.",
+        "parameters": [
+          {
+            "name": "app_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the application the group is in",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the group to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/applications/{app_id}/role-groups/{group_id}/roles/set": {
+      "post": {
+        "operationId": "setRolesToRoleGroup",
+        "summary": "Set role group's roles",
+        "description": "Update the roles of an existing role group of your application. This will replace any existing set of roles of that group. <br><br>**Required permissions**: `organizations:edit`, `roles:edit`.",
+        "parameters": [
+          {
+            "name": "app_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the application to set the roles to",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the group to set the roles to",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiRoleIdsToGroup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "AdminAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiRoleGroup": {
+        "type": "object",
+        "properties": {
+          "group_id": {
+            "type": "string",
+            "description": "Group ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Group name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Group description"
+          },
+          "roles": {
+            "description": "Group's roles",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiRole"
+            }
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Role group's display name"
+          }
+        },
+        "required": [
+          "group_id",
+          "name",
+          "roles"
+        ]
+      },
+      "ApiCreateRolesGroup": {
+        "type": "object",
+        "properties": {
+          "role_ids": {
+            "description": "Ids of the roles",
+            "example": [
+              "role1",
+              "role2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the roles group",
+            "example": "My Group"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the roles group",
+            "example": "My Group's description"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Group display name"
+          }
+        },
+        "required": [
+          "role_ids",
+          "name"
+        ]
+      },
+      "IdentifierIsTakenHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiUpdateRolesGroup": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the roles group",
+            "example": "My Group"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the roles group",
+            "example": "My Group's description"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Group display name"
+          },
+          "role_ids": {
+            "type": "string",
+            "description": "Ids of the roles",
+            "example": [
+              "role1",
+              "role2"
+            ]
+          }
+        }
+      },
+      "NotFoundHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 404
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiRoleIdsToGroup": {
+        "type": "object",
+        "properties": {
+          "role_ids": {
+            "description": "Ids of the roles",
+            "example": [
+              "role1",
+              "role2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "role_ids"
+        ]
+      },
+      "ApiRole": {
+        "type": "object",
+        "properties": {
+          "role_id": {
+            "type": "string",
+            "description": "Role ID"
+          },
+          "role_name": {
+            "type": "string",
+            "description": "Role name"
+          },
+          "permissions": {
+            "description": "Role permissions",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "app_id": {
+            "type": "string",
+            "description": "Role's app id"
+          },
+          "description": {
+            "type": "string",
+            "description": "Role's description"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Role's display name"
+          }
+        },
+        "required": [
+          "role_id",
+          "role_name"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

@@ -1,0 +1,492 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Delegated Access",
+    "description": "Manage delegated access, which allows a user to perform actions on behalf of another user. These APIs allow logged-in users to request consent from other app users, grant consent requests, view all consents related to their account, and revoke any granted permissions.<br><br>To request delegated access, see [OAuth2.0 Token](/openapi/user/oidc/#operation/oidcToken!path=5/client_id&t=request).<br>To create a dependent user with delegated access, see [Create users](/openapi/user/user/#operation/createUser!path=delegated_access&t=request)",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/delegated-access/consents/me/grant": {
+      "post": {
+        "operationId": "grantConsent",
+        "summary": "Grant consent",
+        "description": "Grant the requested consent once it's approved by the user. This will provide the requesting user (the actor) permissions to act on behalf of the user that approved the consent (the subject). Since the approving user must be logged-in, this is authorized using a user access token of the subject.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiConsentId"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Consent has been created for the user"
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/delegated-access/consents/me/request": {
+      "post": {
+        "operationId": "requestConsent",
+        "summary": "Request consent",
+        "description": "Send a consent request to give the requesting user (the actor) permissions to act on behalf of another user (the subject) when needed. An email will be sent to the subject with a link to your consent page. The consent URI will include a query param named consent_id used to grant the consent, permissions array, and the subject's user ID as subject_id. Since this call must be initiated by a logged-in user, it's authorized using a user access token of the actor.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestConsentInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Consent request has been sent"
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/delegated-access/consents/me": {
+      "get": {
+        "operationId": "getUserConsents",
+        "summary": "Get consents",
+        "description": "Get all the consents that were granted or requested by the specified user. This call is authorized by a user access token of this user.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The requested user permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserConsents"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/delegated-access/consents/me/permissions/actor": {
+      "delete": {
+        "operationId": "removeSubjectPermissionsOfLoggedInActor",
+        "summary": "Revoke permissions as actor",
+        "description": "Revokes my permissions (the actor) to act on behalf of another user (the subject). This call is initiated by the actor who is logged-in, so it's authorized using a user access token.",
+        "parameters": [
+          {
+            "name": "permissions",
+            "required": false,
+            "in": "query",
+            "description": "Names of permissions to revoke. If no permissions are specified, all permissions will be revoked.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "subject_id",
+            "required": true,
+            "in": "query",
+            "description": "ID of the user that granted the permissions.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permissions revoked"
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/delegated-access/consents/me/permissions/subject": {
+      "delete": {
+        "operationId": "removeActorPermissionsOfLoggedInSubject",
+        "summary": "Revoke permissions as subject",
+        "description": "Revokes permissions of another user (the actor) to act on my behalf (the subject). This call is initiated by the subject who is logged-in, so it's authorized using a user access token.",
+        "parameters": [
+          {
+            "name": "permissions",
+            "required": false,
+            "in": "query",
+            "description": "Names of permissions to revoke. If no permissions are specified, all permissions will be revoked.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "actor_id",
+            "required": true,
+            "in": "query",
+            "description": "ID of the user that received the permissions.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permissions revoked"
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiConsentId": {
+        "type": "object",
+        "properties": {
+          "consent_id": {
+            "type": "string",
+            "description": "Consent ID returned to your consent URI upon redirection"
+          }
+        },
+        "required": [
+          "consent_id"
+        ]
+      },
+      "BadRequestHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "example": "Bad request",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_code": {
+            "type": "number",
+            "example": 400
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "RequestConsentInputDto": {
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "description": "Names of permissions",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "consent_uri": {
+            "type": "string",
+            "example": "https://www.example.com/consent",
+            "description": "URI of your consent page, which the browser will redirect to when the user clicks the link in the consent email. The URI must accept the following query parameters: consent_id used to grant the consent, permissions array of permissions to present the user to approve, subject_id and actor_id. This URI must also be configured as an allowed redirect URI in the Admin Portal."
+          },
+          "subject_id": {
+            "type": "string",
+            "description": "ID of the user that grants permissions to another user to act on their behalf"
+          },
+          "consent_expiration": {
+            "type": "number",
+            "description": "Validity period of the consent in seconds. Once expired, new consent must be granted to obtain the permissions"
+          }
+        },
+        "required": [
+          "permissions",
+          "consent_uri",
+          "subject_id"
+        ]
+      },
+      "NotFoundHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 404
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "UserConsents": {
+        "type": "object",
+        "properties": {
+          "consents_as_actor": {
+            "description": "Consents requested by this user (as the actor)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiSubjectIdAndConsentData"
+            }
+          },
+          "consents_as_subject": {
+            "description": "Consents that this user was requested to grant (as the subject)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiActorIdAndConsentData"
+            }
+          }
+        }
+      },
+      "ApiSubjectIdAndConsentData": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "description": "ID of the user that received the consent request"
+          },
+          "consents": {
+            "description": "Consent data",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiConsentData"
+            }
+          }
+        },
+        "required": [
+          "subject_id",
+          "consents"
+        ]
+      },
+      "ApiActorIdAndConsentData": {
+        "type": "object",
+        "properties": {
+          "actor_id": {
+            "type": "string",
+            "description": "ID of the user that requested the consent"
+          },
+          "consents": {
+            "description": "Consent data",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiConsentData"
+            }
+          }
+        },
+        "required": [
+          "actor_id",
+          "consents"
+        ]
+      },
+      "ApiConsentData": {
+        "type": "object",
+        "properties": {
+          "consent_id": {
+            "type": "string",
+            "description": "Consent ID returned to your consent URI upon redirection"
+          },
+          "permission": {
+            "type": "string",
+            "description": "Names of permissions"
+          },
+          "consent_status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "GRANTED",
+              "REVOKED",
+              "EXPIRED"
+            ],
+            "description": "Status of the consent"
+          },
+          "expired_on": {
+            "type": "number",
+            "description": "Expiration date of the consent, specified as unix epoch in seconds. Once expired, new consent must be granted to obtain the permissions"
+          }
+        },
+        "required": [
+          "consent_id",
+          "permission",
+          "consent_status"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

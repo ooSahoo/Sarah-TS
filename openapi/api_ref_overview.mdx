@@ -1,0 +1,42 @@
+---
+showNextButton: false
+title: Overview
+---
+
+import {
+  Box,
+} from "@redocly/developer-portal/ui";
+import {Cards, Title, MiniCardAPI} from "../components/main-page-components"
+
+<Box>
+  <Title margin="1.35em 0 8px" style={{fontSize: "32px", fontFamily: '"Plus Jakarta Sans", sans-serif'}}>
+    API reference
+  </Title>
+  <p>Mosaic builds every feature using an API-first approach, to give you APIs that are consistent, reusable, and well-designed. This lets you create great identity experiences for your users, and develop better products—faster.</p>
+  <Cards>
+    <MiniCardAPI title="Get Started" isBig={true} href="/openapi/api_ref_intro/">
+      Get started with Mosaic APIs
+    </MiniCardAPI>
+    <MiniCardAPI title="Backend Authentication " isBig={true} href="/openapi/user/backend-one-time-login/">
+      WebAuthn, TOTP, OTP & more
+    </MiniCardAPI>
+    <MiniCardAPI title="OIDC & Hosted Authentication " isBig={true} href="/openapi/user/one-time-login/">
+      Hosted login and OIDC
+    </MiniCardAPI>
+    <MiniCardAPI title="Identity Management " isBig={true} href="/openapi/user/user/">
+      Manage users and access
+    </MiniCardAPI>
+    <MiniCardAPI title="Fraud Prevention " isBig={true} href="/openapi/risk/recommendations/">
+      Detect risk and prevent fraud
+    </MiniCardAPI>
+    <MiniCardAPI title="Identity Verification " isBig={true} href="/openapi/verify/verifications/">
+      Verify users with documents
+    </MiniCardAPI>
+    <MiniCardAPI title="Organizations (B2B)" isBig={true} href="/openapi/user/organizations/">
+      Login organization members
+    </MiniCardAPI>
+    <MiniCardAPI title="Platform Administration " isBig={true} href="/openapi/user/apps/">
+      Manage platform configuration
+    </MiniCardAPI>
+  </Cards>
+</Box>

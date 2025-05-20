@@ -1,0 +1,15 @@
+type: reference-docs
+definitionId: userid-roles
+settings:
+  corsProxyUrl:  https://cors.redoc.ly
+  generateCodeSamples:
+    languages:
+      - lang: curl
+      - lang: Node.js
+      - lang: Go
+      - lang: JavaScript
+      - lang: Java
+      - lang: Python
+  showSecuritySchemeType: true
+  hideDownloadButton: false
+  pagination: none

@@ -1,0 +1,395 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mobile Biometrics",
+    "description": "Login users with native mobile biometrics. This process relies on the device ability to leverage built-in biometric sensors. To support mobile biometrics in the app, first implement the SDK call that creates an authenticator (cryptographic key-pair) on the end-user device and then register this authenticator with Transmit. The private key remains securely stored on the device and protected by biometrics, while the public key is registered with Transmit for a given user. To authenticate, the device uses mobile biometrics to access the private key and to sign a challenge that gets verified by Transmit. Note: registration and authentication are two-step procedures that start by calling the client-side SDK provided by Transmit, and complete using these APIs.",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/auth/mobile-biometrics/authenticate": {
+      "post": {
+        "operationId": "authenticateNativeMobileBiometrics",
+        "summary": "Authenticate with mobile biometrics",
+        "description": "Completes authentication in Transmit. Before calling this API, invoke the client-side SDK provided by Transmit to sign a challenge using the private key stored by the device, which only occurs after the user verifies themselves with biometrics. Returns an access token for the user associated with the key.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiNativeMobileBiometricsTokenRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns user tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiTokenResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/mobile-biometrics/register": {
+      "post": {
+        "operationId": "mobile-biometrics-registration",
+        "summary": "Register mobile biometrics",
+        "description": "Completes mobile biometrics registration in Transmit. Before calling this API, create an authenticator (cryptographic key-pair) on the end-user's device by invoking the client-side SDK provided by Transmit. This API must be called from the backend using the user access token returned upon successful authentication. If successful, the mobile biometrics authenticator will be registered for the user that corresponds to the authorization token.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiMobileBiometricsRegisterRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Register mobile biometrics"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidRequest": {
+                    "value": {
+                      "error_code": "invalid_request",
+                      "message": "Invalid request: property should not be null or undefined"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ClientNotFound": {
+                    "value": {
+                      "error_code": "client_not_found",
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/mobile-biometrics/delete": {
+      "delete": {
+        "operationId": "mobile-biometrics-deletion",
+        "summary": "Delete mobile biometrics",
+        "description": "Deletes mobile biometrics authenticator for a user that is currently logged in. This API must be called from the backend using the user access token. If successful, the key will be deleted for the user that corresponds to the authorization token.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiMobileBiometricsDeleteRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Key deleted"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidRequest": {
+                    "value": {
+                      "error_code": "invalid_request",
+                      "message": "Invalid request: property should not be null or undefined"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ClientNotFound": {
+                    "value": {
+                      "error_code": "client_not_found",
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiNativeMobileBiometricsTokenRequestDto": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "description": "Resource URI the authentication request is attempting to access, which is reflected in the audience (`aud` claim) of the access token. This must be configured as resource for the application."
+          },
+          "claims": {
+            "example": {
+              "id_token": {
+                "roles": null
+              }
+            },
+            "description": "Used to request additional claims in the ID token, such as roles, permissions, and other user profile data. The structure is per the [OIDC Standard](https://openid.net/specs/openid-connect-core-1_0-final.html#ClaimsParameter). For supported claims and how to request custom claims, see the [ID Token Reference](https://developer.transmitsecurity.com/openapi/id_token_reference/).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiTokenRequestClaims"
+              }
+            ]
+          },
+          "org_id": {
+            "type": "string",
+            "description": "Organization ID, used for member login in B2B scenarios"
+          },
+          "client_attributes": {
+            "description": "Client attributes",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientAttributes"
+              }
+            ]
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Used to associate the authentication with an existing session (such as for MFA). If unspecified, a new session is created and the session ID is returned."
+          },
+          "signature": {
+            "type": "string",
+            "description": "Signed challenge returned by SDK authentication call"
+          },
+          "challenge": {
+            "type": "string",
+            "description": "A string used to create attestation"
+          },
+          "key_id": {
+            "type": "string",
+            "description": "ID of the key"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "ID of the user"
+          }
+        },
+        "required": [
+          "signature",
+          "challenge",
+          "key_id",
+          "user_id"
+        ]
+      },
+      "ApiTokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "User access token for accessing endpoints on behalf of the authenticated user."
+          },
+          "id_token": {
+            "type": "string",
+            "description": "ID token that identifies the user."
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh token used to refresh an expired access token."
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Bearer."
+          },
+          "expires_in": {
+            "type": "number",
+            "description": "Expiration time of the access token in seconds.",
+            "default": 3600
+          },
+          "session_id": {
+            "type": "string",
+            "description": "ID of the session in which the authentication occurs."
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in",
+          "session_id"
+        ]
+      },
+      "ApiTokenRequestClaims": {
+        "type": "object",
+        "properties": {
+          "id_token": {
+            "type": "object"
+          },
+          "access_token": {
+            "type": "object"
+          },
+          "userinfo": {
+            "type": "object"
+          }
+        }
+      },
+      "ClientAttributes": {
+        "type": "object",
+        "properties": {
+          "user_agent": {
+            "type": "string"
+          },
+          "ip_address": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiMobileBiometricsRegisterRequestDto": {
+        "type": "object",
+        "properties": {
+          "publicKey": {
+            "type": "string",
+            "description": "Public key generated by SDK registration call"
+          },
+          "publicKeyId": {
+            "type": "string",
+            "description": "ID of the public key"
+          },
+          "encryptionType": {
+            "type": "string",
+            "description": "Encryption type",
+            "enum": [
+              "rsa",
+              "ec"
+            ],
+            "default": "rsa"
+          },
+          "challenge": {
+            "type": "string",
+            "description": "A string used to create attestation"
+          },
+          "attestation_encoded_result": {
+            "type": "string",
+            "description": "Encoded attestation data"
+          },
+          "os": {
+            "type": "string",
+            "description": "OS type"
+          }
+        },
+        "required": [
+          "publicKey",
+          "publicKeyId",
+          "os"
+        ]
+      },
+      "ApiMobileBiometricsDeleteRequestDto": {
+        "type": "object",
+        "properties": {
+          "publicKeyId": {
+            "type": "string",
+            "description": "ID of the public key"
+          }
+        },
+        "required": [
+          "publicKeyId"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

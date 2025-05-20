@@ -1,0 +1,866 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Auth Sessions",
+    "description": "Manage sessions that provide context for WebAuthn APIs",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/auth-session/start-with-authorization": {
+      "post": {
+        "operationId": "startAuthorizedAuthSession",
+        "summary": "Start authorized session",
+        "deprecated": true,
+        "description": "Start authorized auth session for user flows that include registration, such as onboarding new users or offering WebAuthn registration to users that logged in using a legacy system or other Transmit login methods. This session must be authorized using an access token that's either fetched using client credentials, or was returned by another Transmit authentication. It must be called from the client backend",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiAuthSessionStartWithAuthorizationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Auth session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiAuthSessionStartWithAuthorizationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidRequest": {
+                    "value": {
+                      "error_code": "invalid_request",
+                      "message": "Invalid request: property should not be null or undefined"
+                    }
+                  },
+                  "InvalidWebAuthnConfig": {
+                    "value": {
+                      "error_code": "invalid_webauthn_config",
+                      "message": "Invalid client configuration"
+                    }
+                  },
+                  "MissingRedirectUri": {
+                    "value": {
+                      "error_code": "missing_redirect_uri",
+                      "message": "Redirect URIs were not configured for this client"
+                    }
+                  },
+                  "InvalidRedirectUri": {
+                    "value": {
+                      "error_code": "invalid_redirect_uri",
+                      "message": "Invalid client configuration"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidAccessToken": {
+                    "value": {
+                      "error_code": "unauthorized_request",
+                      "message": "Unauthorized request: JWT access token is missing or invalid"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ClientNotFound": {
+                    "value": {
+                      "error_code": "client_not_found",
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/auth-session/authorize": {
+      "post": {
+        "operationId": "authorizeAuthSession",
+        "summary": "Authorize session",
+        "deprecated": true,
+        "description": "Authorize an auth session to an authorized state. for user flows that include registration, such as onboarding new users or offering WebAuthn registration to users that logged in using a legacy system or other Transmit login methods. This session must be authorized using an access token that's either fetched using client credentials, or was returned by another Transmit authentication. It must be called from the client backend.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiAuthSessionAuthorizeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Auth session authorized"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidRequest": {
+                    "value": {
+                      "error_code": "invalid_request",
+                      "message": "Invalid request: property should not be null or undefined"
+                    }
+                  },
+                  "InvalidAuthSession": {
+                    "value": {
+                      "error_code": "invalid_auth_session",
+                      "message": "Requested action can't be performed for the given session"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidAccessToken": {
+                    "value": {
+                      "error_code": "unauthorized_request",
+                      "message": "Unauthorized request: JWT access token is missing or invalid"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ClientNotFound": {
+                    "value": {
+                      "error_code": "client_not_found",
+                      "message": "Client not found"
+                    }
+                  },
+                  "AuthSessionNotFound": {
+                    "value": {
+                      "error_code": "auth_session_not_found",
+                      "message": "Session not found"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/auth-session/start-restricted": {
+      "post": {
+        "operationId": "startRestrictedAuthSession",
+        "summary": "Start unauthorized session",
+        "deprecated": true,
+        "description": "Start unauthorized auth session for user flows that only include authentication or recovery (not registration, which required an authorized session). This call must be made from the client.",
+        "parameters": [
+          {
+            "name": "User-Agent",
+            "required": false,
+            "in": "header",
+            "description": "Browser user agent. Allows adding device info to sessions if provided",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiAuthSessionStartRestrictedDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Auth session created",
+            "headers": {
+              "set-device-binding-token": {
+                "description": "A token that binds the device to the session",
+                "example": "8ac0bdca-affb-4b1b-af50-2f834ad266b3",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiAuthSessionStartWithAuthorizationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidRequest": {
+                    "value": {
+                      "error_code": "invalid_request",
+                      "message": "Invalid request: property should not be null or undefined"
+                    }
+                  },
+                  "InvalidWebAuthnConfig": {
+                    "value": {
+                      "error_code": "invalid_webauthn_config",
+                      "message": "Invalid client configuration"
+                    }
+                  },
+                  "MissingRedirectUri": {
+                    "value": {
+                      "error_code": "missing_redirect_uri",
+                      "message": "Redirect URIs were not configured for this client"
+                    }
+                  },
+                  "InvalidRedirectUri": {
+                    "value": {
+                      "error_code": "invalid_redirect_uri",
+                      "message": "Invalid client configuration"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ClientNotFound": {
+                    "value": {
+                      "error_code": "client_not_found",
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/v1/auth-session/status": {
+      "post": {
+        "operationId": "getSessionStatus",
+        "summary": "Get session status",
+        "deprecated": true,
+        "description": "Get the status of an auth session in cross-device flows (e.g., if the authenticating device was attached) and obtain the authorization code to exchange for user tokens",
+        "parameters": [
+          {
+            "name": "x-ts-device-binding-token",
+            "in": "header",
+            "description": "Device binding token, returned by the first client-side request from a device in the session (in the `set-device-binding-token` response header)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiAuthSessionStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Auth session status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiAuthSessionStatusResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidRequest": {
+                    "value": {
+                      "error_code": "invalid_request",
+                      "message": "Invalid request: property should not be null or undefined"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingDeviceBindingToken": {
+                    "value": {
+                      "error_code": "device_binding_token_not_provided",
+                      "message": "Token is missing"
+                    }
+                  },
+                  "InvalidDeviceBindingToken": {
+                    "value": {
+                      "error_code": "invalid_device_binding_token",
+                      "message": "Invalid token"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ClientNotFound": {
+                    "value": {
+                      "error_code": "client_not_found",
+                      "message": "Client not found"
+                    }
+                  },
+                  "AuthSessionNotFound": {
+                    "value": {
+                      "error_code": "auth_session_not_found",
+                      "message": "Session not found"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/v1/auth-session/attach-device": {
+      "post": {
+        "operationId": "attachDeviceToSession",
+        "summary": "Attach to auth session",
+        "deprecated": true,
+        "description": "Attach another device to an existing session for cross-device flows (e.g., when a QR code is scanned)",
+        "parameters": [
+          {
+            "name": "User-Agent",
+            "required": false,
+            "in": "header",
+            "description": "Browser user agent. Allows adding device info to sessions if provided",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiAuthSessionAttachDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Device binding info",
+            "headers": {
+              "set-device-binding-token": {
+                "description": "A token that binds the device to the session",
+                "example": "8ac0bdca-affb-4b1b-af50-2f834ad266b3",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiAuthSessionAttachDeviceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidRequest": {
+                    "value": {
+                      "error_code": "invalid_request",
+                      "message": "Invalid request: property should not be null or undefined"
+                    }
+                  },
+                  "InvalidAuthSession": {
+                    "value": {
+                      "error_code": "invalid_auth_session",
+                      "message": "Requested action can't be performed for the given session"
+                    }
+                  },
+                  "DeviceAlreadyAttached": {
+                    "value": {
+                      "error_code": "device_already_attached",
+                      "message": "Object already exists"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ClientNotFound": {
+                    "value": {
+                      "error_code": "client_not_found",
+                      "message": "Client not found"
+                    }
+                  },
+                  "AuthSessionNotFound": {
+                    "value": {
+                      "error_code": "auth_session_not_found",
+                      "message": "Session not found"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/v1/auth-session/detach-device": {
+      "post": {
+        "operationId": "detachDeviceFromSession",
+        "summary": "Detach from auth session",
+        "deprecated": true,
+        "description": "Detach a device from an existing authentication session for cross-device flows. Invalidates device binding token for this device, and updates the cross-device status to completed",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiAuthSessionDetachDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Device detached"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidRequest": {
+                    "value": {
+                      "error_code": "invalid_request",
+                      "message": "Invalid request: property should not be null or undefined"
+                    }
+                  },
+                  "InvalidAuthSession": {
+                    "value": {
+                      "error_code": "invalid_auth_session",
+                      "message": "Requested action can't be performed for the given session"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ClientNotFound": {
+                    "value": {
+                      "error_code": "client_not_found",
+                      "message": "Client not found"
+                    }
+                  },
+                  "AuthSessionNotFound": {
+                    "value": {
+                      "error_code": "auth_session_not_found",
+                      "message": "Session not found"
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiAuthSessionStartWithAuthorizationDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username used to specify the user context. If using an access token from a user authentication (via other Transmit APIs), it must match the user associated with the token."
+          },
+          "session_expiration": {
+            "type": "number",
+            "description": "Session timeout in seconds"
+          },
+          "redirect_uri": {
+            "type": "string",
+            "description": "URI required to complete the WebAuthn flow. This URI must also be configured as an allowed redirect URI in the Transmit Admin Portal"
+          },
+          "device_public_key": {
+            "type": "string",
+            "description": "A public key in a PEM format that will cryptographically bind the device to the credentials. Providing it will enforce double signing for the registered credential"
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "ApiAuthSessionStartWithAuthorizationResponseDto": {
+        "type": "object",
+        "properties": {
+          "auth_session_id": {
+            "type": "string",
+            "description": "Session ID to provide back to the browser. Must be embedded in client-side API calls."
+          }
+        },
+        "required": [
+          "auth_session_id"
+        ]
+      },
+      "ApiAuthSessionAuthorizeDto": {
+        "type": "object",
+        "properties": {
+          "auth_session_id": {
+            "type": "string",
+            "description": "Session identifier"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "Your client ID. Must match the client ID in the token",
+            "deprecated": true
+          },
+          "username": {
+            "type": "string",
+            "description": "Username used to specify the user context. If using an access token from a user authentication (via other Transmit APIs), it must match the user associated with the token."
+          }
+        },
+        "required": [
+          "auth_session_id",
+          "username"
+        ]
+      },
+      "ApiAuthSessionStartRestrictedDto": {
+        "type": "object",
+        "properties": {
+          "session_expiration": {
+            "type": "number",
+            "description": "Session timeout in seconds"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "Your client ID"
+          },
+          "cross_device": {
+            "description": "Data used in cross-device flows",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiAuthSessionStartCrossDeviceData"
+              }
+            ]
+          },
+          "redirect_uri": {
+            "type": "string",
+            "description": "URI required to complete the WebAuthn flow. This URI must also be configured as an allowed redirect URI in the Transmit Admin Portal"
+          },
+          "approval_data": {
+            "type": "object",
+            "example": {
+              "transaction_id": "eFII2y40uB9hQ98nXt3tc1IHkRt8GrRZiqZuRn_59wT",
+              "sum": "200"
+            },
+            "description": "Flat object that contains the data that your customer should approve for a transaction signing or custom approval flow. It can contain up to 10 keys, and only alphanumeric characters, underscores, hyphens, and periods. It will be returned as a claim in the ID token upon successful authentication."
+          }
+        },
+        "required": [
+          "client_id"
+        ]
+      },
+      "ApiAuthSessionStatusDto": {
+        "type": "object",
+        "properties": {
+          "auth_session_id": {
+            "type": "string",
+            "description": "Session identifier"
+          }
+        },
+        "required": [
+          "auth_session_id"
+        ]
+      },
+      "ApiAuthSessionStatusResponse": {
+        "type": "object",
+        "properties": {
+          "session_status": {
+            "type": "string",
+            "enum": [
+              "in-progress",
+              "completed"
+            ],
+            "description": "Indicates global session status. A session is completed only once the authorization code is exchanged for tokens"
+          },
+          "cross_device_status": {
+            "type": "string",
+            "enum": [
+              "pending-attachment",
+              "attached",
+              "registered",
+              "authenticated",
+              "completed"
+            ],
+            "description": "Indicates device status in a cross-device flow. The status is completed only once the device is detached"
+          },
+          "cross_device_result": {
+            "$ref": "#/components/schemas/CrossDeviceResultDto"
+          }
+        },
+        "required": [
+          "session_status",
+          "cross_device_status"
+        ]
+      },
+      "ApiAuthSessionAttachDeviceDto": {
+        "type": "object",
+        "properties": {
+          "auth_session_id": {
+            "type": "string",
+            "description": "Session identifier"
+          },
+          "user_agent": {
+            "type": "string",
+            "description": "Browser user agent. Allows adding device info to sessions if provided"
+          }
+        },
+        "required": [
+          "auth_session_id"
+        ]
+      },
+      "ApiAuthSessionAttachDeviceResponseDto": {
+        "type": "object",
+        "properties": {
+          "binding_info": {
+            "$ref": "#/components/schemas/ApiBindingInfo"
+          }
+        },
+        "required": [
+          "binding_info"
+        ]
+      },
+      "ApiAuthSessionDetachDeviceDto": {
+        "type": "object",
+        "properties": {
+          "auth_session_id": {
+            "type": "string",
+            "description": "Session identifier"
+          }
+        },
+        "required": [
+          "auth_session_id"
+        ]
+      },
+      "CrossDeviceResultDto": {
+        "type": "object",
+        "properties": {
+          "auth_code": {
+            "type": "string",
+            "description": "Authorization code to exchange for user tokens. Provided once the user completes a WebAuthn registration or authentication on the attached device"
+          }
+        },
+        "required": [
+          "auth_code"
+        ]
+      },
+      "ApiBindingInfo": {
+        "type": "object",
+        "properties": {
+          "binding_message": {
+            "type": "string",
+            "description": "Message provided in the session start request, which should be displayed to the user to prevent phishing attacks"
+          },
+          "originating_device": {
+            "$ref": "#/components/schemas/ApiDeviceDto"
+          },
+          "approval_data": {
+            "type": "object",
+            "description": "Approval data provided when the session was started for an approval signing flow"
+          }
+        },
+        "required": [
+          "originating_device"
+        ]
+      },
+      "ApiAuthSessionStartCrossDeviceData": {
+        "type": "object",
+        "properties": {
+          "binding_message": {
+            "type": "string",
+            "description": "Message that should be displayed to the user to prevent phishing attacks. It will be returned upon attaching a device to the session."
+          }
+        }
+      },
+      "ApiDeviceDto": {
+        "type": "object",
+        "properties": {
+          "device_info": {
+            "$ref": "#/components/schemas/AuthSessionDeviceInfo"
+          }
+        },
+        "required": [
+          "device_info"
+        ]
+      },
+      "AuthSessionDeviceInfo": {
+        "type": "object",
+        "properties": {
+          "osType": {
+            "type": "string"
+          },
+          "osVersion": {
+            "type": "string"
+          },
+          "browserType": {
+            "type": "string"
+          },
+          "browserVersion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "osType",
+          "osVersion",
+          "browserType",
+          "browserVersion"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

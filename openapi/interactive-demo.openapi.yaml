@@ -1,0 +1,561 @@
+openapi: 3.0.3
+info:
+  title: Interactive demo
+  description: Follow the interactive demo to learn more about Transmit.
+  version: ''
+servers:
+  - url: https://api.transmitsecurity.io/cis
+    description: Production environment (US, worldwide, except EU)
+  - url: https://api.eu.transmitsecurity.io/cis
+    description: Production environment (EU)
+  - url: https://api.ca.transmitsecurity.io/cis
+    description: Production environment (CA)
+security: []
+paths:
+  /v1/users:
+    post:
+      operationId: createUser
+      summary: Create user
+      description: Add a user to Transmit. A user_id is returned as part of the User in the response that can then be used to perform other operations, such as get, update and delete. An email or a phone_number are required.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiCreateUserInput'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ApiCreatedResponse-createUser
+                type: object
+                required:
+                  - result
+                description: The user has been successfully created.
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ApiUser'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestHttpError'
+        '409':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentifierIsTakenHttpError'
+      security:
+        - Bearer: []
+  /v1/auth/password/authenticate:
+    post:
+      operationId: authenticatePassword
+      summary: Authenticate password
+      description: Authenticates a user using their username and password. The value of this username may correspond to the user's username, phone number, or email (based on what was used to register their password credentials, see [Register password](/openapi/user/user/#operation/addPasswordCredentialsToCurrentUser)).
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiPasswordTokenRequestDto'
+      responses:
+        '200':
+          description: Returns user tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiTokenResponse'
+      security:
+        - Bearer: []
+  /oidc/token:
+    post:
+      operationId: getAccessToken
+      summary: Get client access token
+      description: 'Retrieve an access token to authorize your API request.  <br><br> **NOTE: The request type and examples depend on the service you choose**'
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AServices'
+      responses:
+        '200':
+          description: Access token successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: The access token issued by the authorization server
+                  token_type:
+                    type: string
+                    description: Returned as Bearer
+                    example: Bearer
+                  expires_in:
+                    type: integer
+                    description: Expiration time of the access token in seconds
+                    default: 3600
+                    example: 3600
+                  scope:
+                    type: string
+                    description: Scope of the access token
+                required:
+                  - access_token
+                  - token_type
+                  - expires_in
+                  - scope
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestHttpError'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerHttpError'
+components:
+  schemas:
+    AServices:
+      type: object
+      properties:
+        client_id:
+          type: string
+          description: Client identifier
+        client_secret:
+          type: string
+          description: Client secret
+        grant_type:
+          type: string
+          enum:
+            - client_credentials
+          description: Grant type must be client_credentials.
+      required:
+        - client_id
+        - client_secret
+        - grant_type
+      example:
+        client_id: <ADD_YOUR_CLIENT_ID_HERE>
+        client_secret: <ADD_YOUR_CLIENT_SECRET_HERE>
+        grant_type: client_credentials
+    InternalServerHttpError:
+      type: object
+      properties:
+        message:
+          type: string
+          readOnly: true
+          example: Something went wrong - Internal server error
+        error_code:
+          type: number
+          readOnly: true
+          example: 500
+      required:
+            - message
+            - error_code
+    BadRequestHttpError:
+      type: object
+      properties:
+        message:
+          example: Bad request
+          type: array
+          items:
+            type: string
+        error_code:
+          type: number
+          example: 400
+      required:
+        - message
+        - error_code
+    ApiCreateUserInput:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Primary email address of the user
+        phone_number:
+          type: string
+          description: Primary phone number of the user, specified in E.164 format
+        username:
+          type: string
+          description: Username used to identify the user
+        secondary_emails:
+          description: Secondary email addresses to add to user's current emails
+          type: array
+          items:
+            type: string
+        secondary_phone_numbers:
+          description: Secondary phone numbers to add to user's phone numbers, each specified in E.164 format
+          type: array
+          items:
+            type: string
+        birthday:
+          format: date-time
+          type: string
+          description: User's birthday
+        address:
+          description: User's address
+          allOf:
+            - $ref: '#/components/schemas/ApiCreateOrUpdateAddressInput'
+        name:
+          description: Object describing user's full name
+          allOf:
+            - $ref: '#/components/schemas/ApiUserNameInput'
+        external_account_id:
+          type: string
+          description: User identifier in an app, set by the app
+        custom_app_data:
+          type: object
+          description: Custom data object for app-related user info
+        picture:
+          type: string
+          description: The picture of user, specified as a URL
+        language:
+          type: string
+          description: The language of the user, as provided by the browser using the [Accept-Language](https://www.rfc-editor.org/rfc/rfc7231#section-5.3.5) header field
+        custom_data:
+          type: object
+          description: Custom data object for tenant user info
+        external_user_id:
+          type: string
+          description: A unique identifier in a tenant
+        credentials:
+          description: The password of the user, who is identified by either a username or primary email.
+          allOf:
+            - $ref: '#/components/schemas/ApiUserPasswordInput'
+        delegated_access:
+          description: If this user is a dependent, this defines the permissions that the primary user will have to act on behalf of the dependent user.
+          allOf:
+            - $ref: '#/components/schemas/DelegatedAccessInput'
+      example:
+        username: <ADD USERNAME HERE>
+        credentials:
+          password: <ADD PASSWORD HERE>
+          force_replace: false
+    IdentifierIsTakenHttpError:
+      type: object
+      properties:
+        message:
+          type: string
+        error_code:
+          type: number
+      required:
+        - message
+        - error_code
+    ApiUser:
+      type: object
+      properties:
+        email:
+          description: Primary email address, used as user identifier
+          allOf:
+            - $ref: '#/components/schemas/ApiUserEmail'
+        secondary_emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiUserEmail'
+        phone_number:
+          description: Primary phone number, used as user identifier
+          allOf:
+            - $ref: '#/components/schemas/ApiUserPhone'
+        secondary_phone_numbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiUserPhone'
+        username:
+          type: string
+          description: Username used to identify the user for password login (unless a primary email will be used instead). Defined only if a password was set for the user.
+        user_id:
+          type: string
+          description: User ID autogenerated upon user creation
+        birthday:
+          format: date-time
+          type: string
+          description: Birthday as YYYY-MM-DD
+        address:
+          description: User's address
+          allOf:
+            - $ref: '#/components/schemas/ApiAddress'
+        name:
+          description: Full name
+          allOf:
+            - $ref: '#/components/schemas/ApiUserName'
+        status:
+          $ref: '#/components/schemas/Status'
+        status_changed_at:
+          format: date-time
+          type: string
+          description: Date status was last updated
+        created_at:
+          type: number
+          description: Date user was created in the tenant
+        updated_at:
+          type: number
+          description: Date user was last updated
+        last_auth:
+          format: date-time
+          type: string
+          description: Date user last authenticated
+        external_account_id:
+          type: string
+          description: User identifier in an app, set by the app
+        app_name:
+          type: string
+          description: Name of the app the user is associated with
+        custom_app_data:
+          type: object
+          description: Custom data object for app-related user info
+        groupIds:
+          description: List of group IDs the user is assigned to
+          type: array
+          items:
+            type: string
+        picture:
+          type: string
+          description: The picture of user, specified as a URL
+        language:
+          type: string
+          description: The language of the user, as provided by the browser using the [Accept-Language](https://www.rfc-editor.org/rfc/rfc7231#section-5.3.5) header field
+        custom_data:
+          type: object
+          description: Custom data object for tenant user info
+        external_user_id:
+          type: string
+          description: A unique identifier in a tenant
+        password_information:
+          description: The information of the user's password
+          allOf:
+            - $ref: '#/components/schemas/ApiPasswordInformation'
+      required:
+        - user_id
+        - status
+        - created_at
+        - updated_at
+    ApiCreateOrUpdateAddressInput:
+      type: object
+      properties:
+        country:
+          type: string
+          description: Country
+        state:
+          type: string
+          description: State
+        city:
+          type: string
+          description: City
+        street_address:
+          type: string
+          description: Street address
+        postal_code:
+          type: string
+          description: Postal code
+        type:
+          $ref: '#/components/schemas/AddressType'
+    ApiUserNameInput:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title
+        first_name:
+          type: string
+          description: User's first name
+        last_name:
+          type: string
+          description: User's last name
+        middle_name:
+          type: string
+          description: User's middle name
+    ApiUserPasswordInput:
+      type: object
+      properties:
+        password:
+          type: string
+          description: The user's new password
+        force_replace:
+          type: boolean
+          description: When true the password is temporary and the user will be required to replace it upon successful login
+          default: true
+      required:
+        - password
+    DelegatedAccessInput:
+      type: object
+      properties:
+        actor_id:
+          type: string
+          description: The ID of the primary user that has permissions to act on behalf of this user
+        permissions:
+          description: Names of permissions that are granted to the primary user on behalf of the dependent
+          type: array
+          items:
+            type: string
+      required:
+        - actor_id
+        - permissions
+    ApiAddress:
+      type: object
+      properties:
+        country:
+          type: string
+          description: Country
+          maximum: 30
+        state:
+          type: string
+          description: State
+          maximum: 30
+        city:
+          type: string
+          description: City
+          maximum: 30
+        street_address:
+          type: string
+          description: Street address
+          maximum: 100
+        postal_code:
+          type: string
+          description: Postal code
+          maximum: 20
+        type:
+          $ref: '#/components/schemas/AddressType'
+    ApiUserName:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title
+          maximum: 20
+        first_name:
+          type: string
+          description: User's first name
+          maximum: 30
+        last_name:
+          type: string
+          description: User's last name
+          maximum: 30
+        middle_name:
+          type: string
+          description: User's middle name
+          maximum: 30
+    ApiUserEmail:
+      type: string
+      format: email
+    ApiUserPhone:
+      type: string
+      pattern: ^\+[1-9]\d{1,14}$
+      description: Primary phone number, specified in E.164 format
+    Status:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - DISABLED
+    AddressType:
+      type: string
+      enum:
+        - home
+        - work
+        - other
+    ApiPasswordInformation:
+      type: object
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        expire_at:
+          format: date-time
+          type: string
+          description: The date when the password will expire
+        last_failure_at:
+          format: date-time
+          type: string
+          description: The date when the last failure to authenticate occurred
+    ApiPasswordTokenRequestDto:
+      type: object
+      example:
+        username: <ADD USERNAME HERE>
+        password: MyPassword123$
+        username_type: username
+      properties:
+        resource:
+          type: string
+          description: Resource URI the authentication request is attempting to access, which is reflected in the audience (`aud` claim) of the access token. This must be configured as resource for the application.
+        claims:
+          type: object
+          example:
+            id_token:
+              roles: null
+          description: Used to request additional claims in the ID token, such as roles, permissions, and other user profile data. The structure is per the [OIDC Standard](https://openid.net/specs/openid-connect-core-1_0-final.html#ClaimsParameter). For supported claims and how to request custom claims, see the [ID Token Reference](https://developer.transmitsecurity.com/openapi/id_token_reference/).
+        org_id:
+          type: string
+          description: Organization ID, used for member login in B2B scenarios
+        session_id:
+          type: string
+          description: Used to associate the authentication with an existing session (such as for MFA). If unspecified, a new session is created and the session ID is returned.
+        username:
+          type: string
+          description: Identifier of the user, which may contain the user's username, email or phone number (depending on what was used to register password credentials). The `username_type` must match the type of identifier used.
+        password:
+          type: string
+          description: Password
+        username_type:
+          type: string
+          enum:
+            - username
+            - email
+            - phone_number
+          description: Type of user identifier used to register the password
+          default: username
+      required:
+        - username
+        - password
+    ApiTokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: User access token for accessing endpoints on behalf of the authenticated user.
+        id_token:
+          type: string
+          description: ID token that identifies the user.
+        refresh_token:
+          type: string
+          description: Refresh token used to refresh an expired access token.
+        token_type:
+          type: string
+          description: Bearer.
+        expires_in:
+          type: number
+          description: Expiration time of the access token in seconds.
+          default: 3600
+        session_id:
+          type: string
+          description: ID of the session in which the authentication occurs.
+      required:
+        - access_token
+        - token_type
+        - expires_in
+        - session_id
+  securitySchemes:
+    ClientAccessToken:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oidc/token
+          scopes: {}
+      description: 'A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)'
+    Bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
