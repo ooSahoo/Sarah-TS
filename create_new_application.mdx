@@ -1,0 +1,74 @@
+---
+title : "Create applications"
+description: "To integrate with Mosaic, you'll need to configure an application in the Mosaic Admin Portal."
+mode : wide
+---
+
+Depending on your region, select the portal to use:
+
+<CardGroup cols={3}>
+<Card
+  title="Portal for Global Customers"
+  icon="globe"
+  iconType="solid"
+  href="https://portal.transmitsecurity.io/"
+  horizontal={true}
+>
+  Located in US
+</Card>
+
+<Card
+  title="Portal for EU Customers"
+  icon="earth-europe"
+  iconType="solid"
+  href="https://portal.eu.transmitsecurity.io/"
+  horizontal={true}
+>
+  Located in EU
+</Card>
+
+<Card
+  title="Portal for CA Customers"
+  icon="canadian-maple-leaf"
+  iconType="solid"
+  href="https://portal.ca.transmitsecurity.io/"
+  horizontal={true}
+>
+  Located in CA
+</Card>
+</CardGroup>
+
+<Note>
+This guide covers basic app configuration to help you get started with Mosaic. For details, refer to [How apps and clients work](/guides/user/apps_and_clients/), [Manage apps](/guides/user/manage_apps/), and [Manage clients](/guides/user/manage_clients/).
+</Note>
+
+<Steps>
+  <Step>
+From **Applications** , click **Add application** .
+
+<Frame>
+    <img src="/images/image-1.png"/>
+</Frame>
+  </Step>
+  <Step>
+  Enter basic application information, including:
+  - **Name** : Application name displayed in the Admin Portal
+  - **Description** : Short description of your application, displayed in the Admin Portal
+  - **Application Logo** : (Optional) Your application's logo to use when needed (e.g., in email templates)
+  </Step>
+  <Step>
+  Add a first client and configure its settings, including:
+  - **Protocol** : Set to **OIDC**
+  - **Client Display Name** : Client name to display when needed
+  - **Client Description** : Short description of your client
+  - **Redirect URIs** : List of URI approved for redirects for your application (e.g., redirect URI for magic links)
+  - **Client type** : Set to **Web**
+  - **Authentication method** : Set to **Client secret**
+  </Step>
+</Steps>
+
+
+<Info>
+
+Application ID, Client ID, and Client Secret are automatically generated. You'll need the client credentials to obtain access tokens used to authorize Mosaic API requests and SDK calls.
+</Info>
