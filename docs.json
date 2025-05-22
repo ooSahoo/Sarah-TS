@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "Transmit Security Docs",
   "colors": {
-    "primary": "#fc335f",
-    "light": "#fc335f",
-    "dark": "#fc335f"
+    "primary": "#6980ff",
+    "light": "#6980ff",
+    "dark": "#6980ff"
   },
   "favicon": "/favicon.png",
   "navigation": {
@@ -147,20 +147,20 @@
   "fonts":{
     "heading": {
       "family": "Barlow"
+      "family": "Plus Jakarta Sans"
     }
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "https://transmitsecurity.com/support"
+        "label": "About us",
+        "href": "https://transmitsecurity.com/about"
+      },
+      {
+        "label": "Contact us",
+        "href": "mailto:info@transmitsecurity.com"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Request a demo",
-      "href": "https://transmitsecurity.com/"
-    }
+    ]
   },
   "styling": {
     "codeblocks": "dark"
