@@ -24,6 +24,7 @@
           {
             "group": "Get Started",
             "pages": [
+              "guides/new_ui_announcement",
               "guides/user/create_new_application",
               "guides/user/retrieve_client_tokens"
             ]

@@ -33,6 +33,12 @@ Install our Github App to auto propagate changes from your repo to your deployme
 
 #### Clean build data
 
-````
+```
 rm -rf .mintlify-last
 ```
+#### Clear preview
+
+```
+mit dev --clear
+```
+
