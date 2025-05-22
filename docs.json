@@ -146,7 +146,9 @@
   },
   "fonts":{
     "heading": {
-      "family": "Barlow"
+      "family": "Plus Jakarta Sans"
+    },
+    "body": {
       "family": "Plus Jakarta Sans"
     }
   },
