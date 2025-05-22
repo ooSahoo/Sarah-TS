@@ -1,0 +1,2365 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Users",
+    "description": "Manage user profiles",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://api.transmitsecurity.io/cis",
+      "description": "Production environment (US, worldwide, except EU & Canada)"
+    },
+    {
+      "url": "https://api.eu.transmitsecurity.io/cis",
+      "description": "Production environment (EU)"
+    },
+    {
+      "url": "https://api.ca.transmitsecurity.io/cis",
+      "description": "Production environment (CA)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/users/count": {
+      "get": {
+        "operationId": "getUsersCount",
+        "summary": "Get users count",
+        "description": "Get the number of saved users",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search expression based on the [SCIM protocol](https://www.rfc-editor.org/rfc/rfc7644#section-3.4.2.2). For syntax and searchable fields, see [Search query syntax](/openapi/scim_search_syntax/)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getUsersCount",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "Number of users",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUsersCount"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users": {
+      "post": {
+        "operationId": "createUser",
+        "summary": "Create user",
+        "description": "Add a user to Transmit. A user_id is returned as part of the User in the response that can then be used to perform other operations, such as get, update and delete. An email or a phone_number are required.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiCreateUserInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiCreatedResponse-createUser",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The user has been successfully created.",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentifierIsTakenHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getUsers",
+        "summary": "Get users",
+        "description": "Search across your application’s users at Transmit. This endpoint also allows you to return all of your application’s users by sending no filters at all",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search expression based on the [SCIM protocol](https://www.rfc-editor.org/rfc/rfc7644#section-3.4.2.2). For syntax and searchable fields, see [Search query syntax](/openapi/scim_search_syntax/)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page_offset",
+            "required": false,
+            "in": "query",
+            "description": "Number of users you wish to skip before selecting users",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of users to return in page",
+            "schema": {
+              "maximum": 10000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search_prefix",
+            "required": false,
+            "in": "query",
+            "description": "Value to search for in the primary email and phone_number fields, where the search value must match the prefix of the field value. For example, \"search_prefix=john\" will return users whose email starts with \"john\" and \"search_prefix=%2B1212\" returns users whose phone number starts with \"+1212\".",
+            "example": "joe",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort_field",
+            "required": false,
+            "in": "query",
+            "description": "The name of the field you wish to sort by",
+            "schema": {
+              "default": "created_at",
+              "enum": [
+                "email",
+                "created_at",
+                "phone_number",
+                "last_auth"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort_order",
+            "required": false,
+            "in": "query",
+            "description": "The order of the sort",
+            "schema": {
+              "default": "asc",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiGetAllUsers"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/{user_id}": {
+      "get": {
+        "operationId": "getUserById",
+        "summary": "Get user by ID",
+        "description": "Search for a user by user ID",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "The user ID to search for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getUserById",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateUser",
+        "summary": "Update user",
+        "description": "Update a user's attributes or their custom data. Changes will be merged into the user's profile, so you can specify only the fields you want to update. <br><br> **Note:** <ul> <li> Attributes (like name and address) **cannot** be partially updated, as the new value of an object or array will just replace the current one.</li> <li>`custom_data` **can** be partially updated since it will be merged with the existing data (as a shallow merge).</li></ul>",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the user that should be updated",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user-agent",
+            "required": false,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiUpdateUserInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-updateUser",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The user has been successfully updated.",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/{user_id}/groups": {
+      "get": {
+        "operationId": "getUserGroups",
+        "summary": "Get user's groups",
+        "description": "Retrieve a list of groups associated with a user",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the user to retrieve groups for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getUserGroups",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ApiGroup"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/email/{email}": {
+      "get": {
+        "operationId": "getUserByEmail",
+        "summary": "Get user by email",
+        "description": "Search for a user by primary email",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "path",
+            "description": "The user's primary email to search for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getUserByEmail",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/external-user-id/{external_user_id}": {
+      "get": {
+        "operationId": "getUserByExternalUserId",
+        "summary": "Get user by external user ID",
+        "description": "Search for a user by their external_user_id, which represents the user identifier in external provider",
+        "parameters": [
+          {
+            "name": "external_user_id",
+            "required": true,
+            "in": "path",
+            "description": "The external user ID to search for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getUserByExternalUserId",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/username/{username}": {
+      "get": {
+        "operationId": "getUserByUsername",
+        "summary": "Get user by username",
+        "description": "Search for a user by username",
+        "parameters": [
+          {
+            "name": "username",
+            "required": true,
+            "in": "path",
+            "description": "The user's username to search for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getUserByUsername",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/{user_id}/apps": {
+      "delete": {
+        "operationId": "removeUserFromApp",
+        "summary": "Remove user from app",
+        "description": "Remove a user from the requesting application",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the user to remove from application",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User removed"
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/{user_id}/password": {
+      "post": {
+        "operationId": "addPasswordCredential",
+        "summary": "Create credentials",
+        "description": "Creates new password credentials for a user that doesn't already have a password. The password is temporary, and must be reset upon the user's first login.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the user",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiAddPassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiCreatedResponse-addPasswordCredential",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The password of the user has been successfully added.",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/RegisterPasswordResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictException"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updatePasswordCredential",
+        "summary": "Update password",
+        "description": "Updates the user's existing credentials with a new temporary password, which must be reset the next time they login.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the user",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiUpdatePassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-updatePasswordCredential",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The password of the user has been successfully added.",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/RegisterPasswordResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictException"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/phone/{phone_number}": {
+      "get": {
+        "operationId": "deprecatedGetUserByPhone",
+        "summary": "Get user by phone number",
+        "description": "Search for a user by their primary phone number",
+        "deprecated": true,
+        "parameters": [
+          {
+            "name": "phone_number",
+            "required": true,
+            "in": "path",
+            "description": "The phone number of the user to get",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-deprecatedGetUserByPhone",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The requested user result",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/phone-number/{phone_number}": {
+      "get": {
+        "operationId": "getUserByPhone",
+        "summary": "Get user by phone number",
+        "description": "Search for a user by their primary phone number",
+        "parameters": [
+          {
+            "name": "phone_number",
+            "required": true,
+            "in": "path",
+            "description": "The phone number of the user to get",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getUserByPhone",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "The requested user result",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/ApiUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestHttpError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/{user_id}/emails/{email}": {
+      "delete": {
+        "operationId": "removeUserSecondaryEmail",
+        "summary": "Remove secondary email",
+        "description": "Removes a secondary email address from the user's profile",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "path",
+            "description": "Secondary email to remove",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the user",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Secondary email is removed"
+          },
+          "400": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/{user_id}/phone-numbers/{phone_number}": {
+      "delete": {
+        "operationId": "removeUserSecondaryPhoneNumber",
+        "summary": "Remove secondary phone number",
+        "description": "Remove a secondary phone number from the user's profile",
+        "parameters": [
+          {
+            "name": "phone_number",
+            "required": true,
+            "in": "path",
+            "description": "Secondary phone number to remove",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the user",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Secondary phone number is removed"
+          },
+          "400": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/{user_id}/emails/{email}/verify": {
+      "post": {
+        "operationId": "verifyUserEmail",
+        "summary": "Mark email as verified",
+        "description": "Indicates that the user's email address was verified externally. A user's email address is automatically marked as verified when used in a Transmit authentication or verification flow. If the email address is a secondary email, the request can also be used to set it as the user's primary email (by setting `change_to_primary` to `true`).",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the user that should be updated",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "required": true,
+            "in": "path",
+            "description": "The email of the user that should be verified",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserVerifyEmailOrPhoneNumberInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "User email has been verified"
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/{user_id}/phone-numbers/{phone_number}/verify": {
+      "post": {
+        "operationId": "verifyUserPhoneNumber",
+        "summary": "Mark phone as verified",
+        "description": "Indicates that the user's phone number was verified externally. A user's phone number is automatically marked as verified when used in a Transmit authentication or verification flow. If the phone number is a secondary one, the request can also be used to set it as the user's primary phone (by setting `change_to_primary` to `true`).",
+        "parameters": [
+          {
+            "name": "phone_number",
+            "required": true,
+            "in": "path",
+            "description": "The phone number of the user that should be verified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the user that should be updated",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserVerifyEmailOrPhoneNumberInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "User phone number has been verified"
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ClientAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/manage/users/{user_id}": {
+      "delete": {
+        "operationId": "deleteTenantUser",
+        "summary": "Delete user",
+        "description": "Delete a user and all their data (tenant-level and app-level). Requires an admin access token (from a management app).",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "description": "ID of the user",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted"
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/users/me/password-credentials": {
+      "post": {
+        "operationId": "addPasswordCredentialsToCurrentUser",
+        "summary": "Register password",
+        "description": "Allows a logged-in user to register their first password. Must be authorized using a valid user access token returned upon successful authentication.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiMeAddPassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-addPasswordCredentialsToCurrentUser",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "Password registered",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/RegisterPasswordResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    },
+    "/v1/users/me/device-keys": {
+      "get": {
+        "operationId": "getDeviceKeysForTenant",
+        "summary": "Get current user's device keys",
+        "description": "Get device keys by user id",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "ApiOkResponse-getDeviceKeysForTenant",
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "description": "User's device keys information",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/DeviceKeyResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundHttpError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "UserAccessToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BadRequestHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "example": "Bad request",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error_code": {
+            "type": "number",
+            "example": 400
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiUsersCount": {
+        "type": "object",
+        "properties": {
+          "user_count": {
+            "type": "number",
+            "description": "Number of users"
+          }
+        },
+        "required": [
+          "user_count"
+        ]
+      },
+      "ApiGetAllUsers": {
+        "type": "object",
+        "properties": {
+          "total_count": {
+            "type": "number"
+          },
+          "page_info": {
+            "$ref": "#/components/schemas/PageInfo"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUser"
+            }
+          }
+        },
+        "required": [
+          "total_count",
+          "page_info",
+          "result"
+        ]
+      },
+      "ApiCreateUserInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Primary email address of the user"
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "Primary phone number of the user, specified in E.164 format"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username used to identify the user"
+          },
+          "secondary_emails": {
+            "description": "Secondary email addresses to add to user's current emails",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "secondary_phone_numbers": {
+            "description": "Secondary phone numbers to add to user's phone numbers, each specified in E.164 format",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "birthday": {
+            "format": "date-time",
+            "type": "string",
+            "description": "User's birthday"
+          },
+          "address": {
+            "description": "User's address",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCreateOrUpdateAddressInput"
+              }
+            ]
+          },
+          "name": {
+            "description": "Object describing user's full name",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserNameInput"
+              }
+            ]
+          },
+          "external_account_id": {
+            "type": "string",
+            "description": "User identifier in an app, set by the app"
+          },
+          "custom_app_data": {
+            "type": "object",
+            "description": "Custom data object for app-related user info"
+          },
+          "picture": {
+            "type": "string",
+            "description": "The picture of user, specified as a URL"
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the user, as provided by the browser using the [Accept-Language](https://www.rfc-editor.org/rfc/rfc7231#section-5.3.5) header field"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Custom data object for tenant user info"
+          },
+          "external_user_id": {
+            "type": "string",
+            "description": "A unique identifier in a tenant"
+          },
+          "credentials": {
+            "description": "The password of the user, who is identified by either a username or primary email.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserPasswordInput"
+              }
+            ]
+          },
+          "delegated_access": {
+            "description": "If this user is a dependent, this defines the permissions that the primary user will have to act on behalf of the dependent user.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DelegatedAccessInput"
+              }
+            ]
+          }
+        }
+      },
+      "IdentifierIsTakenHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiUser": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "description": "Primary email address, used as user identifier",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserEmail"
+              }
+            ]
+          },
+          "secondary_emails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUserEmail"
+            }
+          },
+          "phone_number": {
+            "description": "Primary phone number, used as user identifier",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserPhone"
+              }
+            ]
+          },
+          "secondary_phone_numbers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUserPhone"
+            }
+          },
+          "username": {
+            "type": "string",
+            "description": "Username used to identify the user for password login (unless a primary email will be used instead). Defined only if a password was set for the user."
+          },
+          "user_id": {
+            "type": "string",
+            "description": "User ID autogenerated upon user creation"
+          },
+          "birthday": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Birthday as YYYY-MM-DD"
+          },
+          "address": {
+            "description": "User's address",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiAddress"
+              }
+            ]
+          },
+          "name": {
+            "description": "Full name",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserName"
+              }
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "status_changed_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date status was last updated"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Date user was created in the tenant"
+          },
+          "updated_at": {
+            "type": "number",
+            "description": "Date user was last updated"
+          },
+          "identity_providers": {
+            "deprecated": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUserIdentityProvider"
+            }
+          },
+          "identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiUserIdentity"
+            }
+          },
+          "last_auth": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user last authenticated"
+          },
+          "external_account_id": {
+            "type": "string",
+            "description": "User identifier in an app, set by the app"
+          },
+          "app_name": {
+            "type": "string",
+            "description": "Name of the app the user is associated with"
+          },
+          "custom_app_data": {
+            "type": "object",
+            "description": "Custom data object for app-related user info"
+          },
+          "groupIds": {
+            "description": "List of group IDs the user is assigned to",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "picture": {
+            "type": "string",
+            "description": "The picture of user, specified as a URL"
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the user, as provided by the browser using the [Accept-Language](https://www.rfc-editor.org/rfc/rfc7231#section-5.3.5) header field"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Custom data object for tenant user info"
+          },
+          "external_user_id": {
+            "type": "string",
+            "description": "A unique identifier in a tenant"
+          },
+          "password_information": {
+            "description": "The information of the user's password",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiPasswordInformation"
+              }
+            ]
+          }
+        },
+        "required": [
+          "user_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "NotFoundHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 404
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "ApiUpdateUserInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Primary email address of the user"
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "Primary phone number of the user, specified in E.164 format"
+          },
+          "secondary_emails": {
+            "description": "Secondary email addresses to add to user's current emails",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "secondary_phone_numbers": {
+            "description": "Secondary phone numbers to add to user's phone numbers, each specified in E.164 format",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "birthday": {
+            "format": "date-time",
+            "type": "string",
+            "description": "User's birthday"
+          },
+          "address": {
+            "description": "User's address",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCreateOrUpdateAddressInput"
+              }
+            ]
+          },
+          "name": {
+            "description": "Object describing user's full name",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserNameInput"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of user",
+            "enum": [
+              "Active",
+              "Disabled",
+              "Pending"
+            ]
+          },
+          "external_account_id": {
+            "type": "string",
+            "description": "User identifier in an app, set by the app"
+          },
+          "custom_app_data": {
+            "type": "object",
+            "description": "Custom data object for app-related user info"
+          },
+          "picture": {
+            "type": "string",
+            "description": "The picture of user, specified as a URL"
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the user, as provided by the browser using the [Accept-Language](https://www.rfc-editor.org/rfc/rfc7231#section-5.3.5) header field"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Custom data object for tenant user info"
+          },
+          "external_user_id": {
+            "type": "string",
+            "description": "A unique identifier in a tenant"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username used to identify the user for password login (unless a primary email will be used instead)"
+          }
+        }
+      },
+      "ApiGroup": {
+        "type": "object",
+        "properties": {
+          "group_id": {
+            "type": "string",
+            "description": "Group ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Group name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Group description"
+          },
+          "created_at": {
+            "type": "number",
+            "description": "Date group was created in the tenant"
+          },
+          "updated_at": {
+            "type": "number",
+            "description": "Date group was last updated"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Group custom data object"
+          }
+        },
+        "required": [
+          "group_id",
+          "name",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "ApiAddPassword": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "The user's new password"
+          },
+          "force_replace": {
+            "type": "boolean",
+            "description": "When true the password is temporary and the user will be required to replace it upon successful login",
+            "default": true
+          },
+          "username": {
+            "type": "string",
+            "description": "The user's new username. This will be the identifier the user will use to authenticate. If username is not provided and the user has verified their email, that email address will be used as the username."
+          },
+          "enforce_complexity": {
+            "type": "boolean",
+            "description": "If true, the password must meet the password complexity requirements. If false, the password can be any string.",
+            "default": true
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "ConflictException": {
+        "type": "object",
+        "properties": {}
+      },
+      "RegisterPasswordResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "readOnly": true,
+            "example": "Password registered"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ApiUpdatePassword": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "The user's new password"
+          },
+          "force_replace": {
+            "type": "boolean",
+            "description": "When true the password is temporary and the user will be required to replace it upon successful login",
+            "default": true
+          }
+        }
+      },
+      "UserVerifyEmailOrPhoneNumberInput": {
+        "type": "object",
+        "properties": {
+          "change_to_primary": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiMeAddPassword": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "The user's new password"
+          },
+          "username": {
+            "type": "string",
+            "description": "The user's new username. This will be the identifier the user will use to authenticate. If username is not provided and the user has verified their email, that email address will be used as the username."
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "ForbiddenHttpError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error_code": {
+            "type": "number",
+            "example": 403
+          }
+        },
+        "required": [
+          "message",
+          "error_code"
+        ]
+      },
+      "DeviceKeyResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Status of the device",
+            "$ref": "#/components/schemas/DeviceStatus"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Friendly device name, used when displaying a list of the user's devices"
+          },
+          "custom_data": {
+            "type": "object",
+            "description": "Custom data stored for this device, such as tags or device data obtained using other tools"
+          },
+          "push_config": {
+            "description": "Device push notification configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DevicePushConfigDto"
+              }
+            ]
+          },
+          "key_id": {
+            "type": "string",
+            "description": "Identifier of the user's device"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date the device key was added"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date the device key metadata was last updated"
+          }
+        },
+        "required": [
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "PageInfo": {
+        "type": "object",
+        "properties": {
+          "has_next_page": {
+            "type": "boolean"
+          },
+          "has_previous_page": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "has_next_page",
+          "has_previous_page"
+        ]
+      },
+      "Status": {
+        "type": "string",
+        "enum": [
+          "Active",
+          "Disabled",
+          "Pending"
+        ]
+      },
+      "DeviceStatus": {
+        "type": "string",
+        "enum": [
+          "Active",
+          "Blocked",
+          "Suspended"
+        ]
+      },
+      "ApiUserEmail": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Email address"
+          },
+          "email_verified": {
+            "type": "boolean",
+            "description": "Indicates if email was verified (via magic link, social login, or email verification flows)"
+          },
+          "verified_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last verification date of the email"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "ApiUserPhone": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Phone number"
+          },
+          "phone_number_verified": {
+            "type": "boolean",
+            "description": "Indicates if phone number was verified (via SMS OTP or verification flow)"
+          },
+          "verified_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last verification date of the phone number"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "ApiUserIdentityProvider": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Type of identity provider",
+            "enum": [
+              "UserID",
+              "BindID",
+              "Google",
+              "Apple",
+              "Facebook",
+              "Line",
+              "Transmit Identity",
+              "Transmit Security",
+              "BindIDApi",
+              "Email OTP",
+              "SMS OTP",
+              "Email Magic Link",
+              "Password",
+              "Orchestrated",
+              "SAML",
+              "SSO OIDC",
+              "Mobile Biometrics",
+              "totp"
+            ]
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Identifier of the user in the provider's system"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email used by the user to authenticate to this provider"
+          },
+          "first_auth_date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user first authenticated to this provider"
+          },
+          "last_auth_date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user last authenticated to this provider"
+          }
+        },
+        "required": [
+          "source",
+          "identifier",
+          "email",
+          "first_auth_date",
+          "last_auth_date"
+        ]
+      },
+      "ApiUserIdentity": {
+        "type": "object",
+        "properties": {
+          "provider_name": {
+            "type": "string",
+            "description": "Name of identity provider"
+          },
+          "provider_type": {
+            "type": "string",
+            "description": "Indicates whether the identity provider is Transmit (Native) or a social login provider (OAuth2)",
+            "enum": [
+              "OAuth2",
+              "Native",
+              "External"
+            ]
+          },
+          "auth_type": {
+            "type": "string",
+            "enum": [
+              "webauthn",
+              "email_otp",
+              "sms_otp",
+              "email_magic_link",
+              "password",
+              "oauth2",
+              "saml",
+              "transmit",
+              "totp"
+            ],
+            "description": "Type of authentication method that was used"
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Identifier of the user in the provider's system"
+          },
+          "user_alias": {
+            "description": "Alias used by the user to authenticate to this provider",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiUserIdentityAlias"
+              }
+            ]
+          },
+          "first_auth_date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user first authenticated to this provider"
+          },
+          "last_auth_date": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date user last authenticated to this provider"
+          }
+        },
+        "required": [
+          "provider_name",
+          "provider_type",
+          "auth_type",
+          "identifier",
+          "first_auth_date",
+          "last_auth_date"
+        ]
+      },
+      "ApiCreateOrUpdateAddressInput": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Country"
+          },
+          "state": {
+            "type": "string",
+            "description": "State"
+          },
+          "city": {
+            "type": "string",
+            "description": "City"
+          },
+          "street_address": {
+            "type": "string",
+            "description": "Street address"
+          },
+          "postal_code": {
+            "type": "string",
+            "description": "Postal code"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AddressType"
+          }
+        }
+      },
+      "ApiUserNameInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "User's first name"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "User's last name"
+          },
+          "middle_name": {
+            "type": "string",
+            "description": "User's middle name"
+          }
+        }
+      },
+      "ApiUserPasswordInput": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "The user's new password"
+          },
+          "force_replace": {
+            "type": "boolean",
+            "description": "When true the password is temporary and the user will be required to replace it upon successful login",
+            "default": true
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "DelegatedAccessInput": {
+        "type": "object",
+        "properties": {
+          "actor_id": {
+            "type": "string",
+            "description": "The ID of the primary user that has permissions to act on behalf of this user"
+          },
+          "permissions": {
+            "description": "Names of permissions that are granted to the primary user on behalf of the dependent",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "actor_id",
+          "permissions"
+        ]
+      },
+      "ApiAddress": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Country",
+            "maximum": 30
+          },
+          "state": {
+            "type": "string",
+            "description": "State",
+            "maximum": 30
+          },
+          "city": {
+            "type": "string",
+            "description": "City",
+            "maximum": 30
+          },
+          "street_address": {
+            "type": "string",
+            "description": "Street address",
+            "maximum": 150
+          },
+          "postal_code": {
+            "type": "string",
+            "description": "Postal code",
+            "maximum": 30
+          },
+          "type": {
+            "$ref": "#/components/schemas/AddressType"
+          },
+          "updated_at": {
+            "type": "number",
+            "description": "Date user's address was last updated"
+          }
+        }
+      },
+      "ApiUserName": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title",
+            "maximum": 30
+          },
+          "first_name": {
+            "type": "string",
+            "description": "User's first name",
+            "maximum": 30
+          },
+          "last_name": {
+            "type": "string",
+            "description": "User's last name",
+            "maximum": 30
+          },
+          "middle_name": {
+            "type": "string",
+            "description": "User's middle name",
+            "maximum": 30
+          }
+        }
+      },
+      "ApiPasswordInformation": {
+        "type": "object",
+        "properties": {
+          "expired": {
+            "type": "boolean",
+            "description": "Whether the password is currently expired"
+          },
+          "temporary": {
+            "type": "boolean",
+            "description": "Whether the password must be reset after first use"
+          },
+          "updated_at": {
+            "type": "number",
+            "description": "The date the password was last updated, as unix epoch in milliseconds"
+          }
+        },
+        "required": [
+          "expired",
+          "temporary",
+          "updated_at"
+        ]
+      },
+      "DevicePushConfigDto": {
+        "type": "object",
+        "properties": {
+          "device_token": {
+            "type": "string",
+            "description": "Device token for push notifications (FCM registration token or APN device token)",
+            "minLength": 32,
+            "maxLength": 255
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "FCM",
+              "APN"
+            ],
+            "description": "Type of push notification"
+          }
+        },
+        "required": [
+          "device_token",
+          "type"
+        ]
+      },
+      "AddressType": {
+        "type": "string",
+        "enum": [
+          "Home",
+          "Work",
+          "Other"
+        ]
+      },
+      "ApiUserIdentityAlias": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Alias type, which varies based on authentication method",
+            "enum": [
+              "username",
+              "email",
+              "phone_number",
+              "unspecified"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "description": "Alias value"
+          }
+        },
+        "required": [
+          "type",
+          "value"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "UserAccessToken": {
+        "type": "http",
+        "description": "A token returned upon end-user authentication, which provides access to resources and data for the user and app for which it was generated",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "AdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by a management application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to all resources for the tenant and its apps"
+      },
+      "ClientAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token generated by an end-user application using the [token endpoint](/openapi/token/#operation/getAccessToken). It provides access to resources and data on the tenant level or associated with the specific application (but not other apps in the tenant)"
+      },
+      "OrgAdminAccessToken": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oidc/token",
+            "scopes": {}
+          }
+        },
+        "description": "A token returned upon B2B authentication for a user that has the organizationAdmin or organizationCreator role."
+      }
+    }
+  }
+}

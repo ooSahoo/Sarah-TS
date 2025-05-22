@@ -1,0 +1,213 @@
+---
+mode: "custom"
+---
+
+import { Button } from '/snippets/button.mdx';
+
+export function openSearch() {
+  document.getElementById('search-bar-entry').click();
+}
+
+<div className="relative w-full flex items-center justify-center" style={{ height: '24rem', overflow: 'hidden' }}>
+  <div className="absolute inset-0 bg-primary dark:bg-primary-light" style={{ opacity: 0.05 }}></div>
+  <div style={{ position: 'absolute', textAlign: 'center', padding: '0 1rem' }}>
+    <div
+      className="text-gray-900 dark:text-gray-200"
+      style={{
+        fontWeight: '600',
+        fontSize: '42px',
+        margin: '0',
+        marginBottom: '1.5rem'
+      }}
+    >
+      Welcome to Mosaic Platform by Transmit Security
+    </div>
+    <p
+      className="prose prose-gray dark:prose-invert"
+      style={{
+        margin: '0 auto',
+        marginBottom: '2rem',
+        fontWeight: '400',
+        fontSize: '16px',
+        maxWidth: '42rem',
+        textAlign: 'center'
+      }}
+    >
+      Explore the docs to learn everything you need to power your applications with Mosaic
+    </p>
+    <div className="flex items-center justify-center">
+      <button
+        type="button"
+        className="hidden w-full lg:flex items-center text-sm leading-6 rounded-lg py-1.5 pl-2.5 pr-3 shadow-sm text-gray-400 dark:text-white/50 bg-background-light dark:bg-background-dark dark:brightness-[1.1] dark:ring-1 dark:hover:brightness-[1.25] ring-1 ring-gray-400/20 hover:ring-gray-600/25 dark:ring-gray-600/30 dark:hover:ring-gray-500/30 focus:outline-primary"
+        id="home-search-entry"
+        style={{ maxWidth: '28rem' }}
+        onClick={openSearch}
+      >
+        <svg
+          className="h-4 w-4 ml-1.5 flex-none bg-gray-500 hover:bg-gray-600 dark:bg-white/50 dark:hover:bg-white/70"
+          style={{
+            marginRight: '0.5rem',
+            maskImage: 'url("https://mintlify.b-cdn.net/v6.5.1/solid/magnifying-glass.svg")',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center center',
+          }}
+        />
+        Search or ask
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  style={{
+    marginTop: '2rem',
+    marginBottom: '8rem',
+    maxWidth: '70rem',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: '1.25rem',
+    paddingRight: '1.25rem'
+  }}
+>
+  <div
+    style={{
+      textAlign: 'left',
+      color: '#111827',
+      marginBottom: '2rem',
+      fontSize: '16px',
+      fontWeight: '400'
+    }}
+  >
+  
+    The <strong>Mosaic Platform</strong> by <strong>Transmit Security</strong> secures and simplifies the full customer journey with unified customer identity management, <br />
+    fraud prevention and identity verification services. With a powerful risk engine and layers of orchestrated services, the platform adapts user flows to mitigate risk or elevate trust in real time. Explore the docs to learn everything you need to power your applications with Mosaic.
+  </div>
+
+  <Card
+    title="New navigation in Admin Portal"
+    icon="sparkles"
+    iconType="solid"
+    href="/guides/guides_intro"
+  >
+    Mosaic’s navigation has been redesigned for clarity and efficiency
+    <br />
+    <Button href="/guides/new_ui_announcement/">
+      What's new?
+    </Button>
+  </Card>
+
+  <div className="flex flex-col w-full" style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+    <h2
+      className="text-gray-900 dark:text-gray-200"
+      style={{
+        fontSize: '2rem',
+        fontWeight: '500',
+      }}
+    >
+      Learn about Mosaic
+    </h2>
+  </div>
+
+  <CardGroup cols={3}>
+    <Card
+      title="Journeys"
+      icon="puzzle"
+      iconType="solid"
+      href="/dev-tools/dev_tools_overview"
+    >
+      Launch faster with integration tools
+    </Card>
+
+    <Card
+      title="API Reference"
+      icon="code"
+      iconType="solid"
+      href="/openapi/api_ref_overview"
+    >
+      Integrate with our API endpoints
+    </Card>
+
+    <Card
+      title="SDK Reference"
+      icon="book"
+      iconType="solid"
+      href="/sdk-ref/platform/introduction"
+    >
+      Learn about our client SDKs
+    </Card>
+  </CardGroup>
+
+  <div className="flex flex-col w-full" style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+    <h2
+      className="text-gray-900 dark:text-gray-200"
+      style={{
+        fontSize: '2rem',
+        fontWeight: '500',
+      }}
+    >
+      Browse by solution
+    </h2>
+  </div>
+
+  <CardGroup>
+    <Card
+      title="Authentication"
+      icon="lock"
+      href="/guides/user/be_auth_overview/"
+      iconType="solid"
+      horizontal
+    >
+      Build seamless passwordless experiences
+    </Card>
+
+    <Card
+      title="Identity Orchestration"
+      icon="diagram-project"
+      href="/guides/journeys_intro/"
+      iconType="solid"
+      horizontal
+    >
+      Build identity journeys for your users
+    </Card>
+
+    <Card
+      title="Identity Management"
+      icon="users-gear"
+      href="/guides/user/identity_mgmt_overview/"
+      iconType="solid"
+      horizontal
+    >
+      Manage your users, their profiles, and access
+    </Card>
+
+    <Card
+      title="Detection and Response"
+      icon="shield-halved"
+      href="/guides/risk/overview/"
+      iconType="solid"
+      horizontal
+    >
+      Detect risk and establish trust
+    </Card>
+
+    <Card
+      title="Identity Verification"
+      icon="id-badge"
+      href="/guides/verify/identity_verification_overview/"
+      iconType="solid"
+      horizontal
+    >
+      Verify user identities using documents
+    </Card>
+
+    <Card
+      title="Automated Workflows"
+      icon="gears"
+      href="/guides/automated-workflows/overview/"
+      iconType="solid"
+      horizontal
+    >
+      Design automation in a visual workflow builder
+    </Card>
+  </CardGroup>
+</div>

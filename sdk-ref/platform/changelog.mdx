@@ -1,0 +1,60 @@
+---
+title : "Changelog"
+---
+
+<Update label="Feb. 2, 2025" description="v1.10.4">
+  Identity verification:
+  - fix: Stop pulling status after moving from capturing steps.
+</Update>
+
+<Update label="Jan. 19, 2025" description="v1.10.3">
+  Identity orchestration:
+  - feat: Add support for `Transaction Signing` with passkeys action.
+</Update>
+
+<Update label="Jan. 12, 2025" description="v1.10.2">
+  Webauthn:
+  - feat: Allow anonymous transaction signing, (without username parameter).
+  
+  Identity verification:
+  - feat: Add error handling for expired session status
+</Update>
+
+<Update label="Dec. 22, 2024" description="v1.10.1">
+  Detection and response:
+  - feat: Increase session token resilience within the session
+  
+  Identity orchestration:
+  - refactor: change request logging to debug level
+</Update>
+
+<Update label="Nov. 17, 2024" description="v1.10.0">
+  Identity verification:
+  - feat: Sign images with crypto-binding
+  
+  Detection and response:
+  - feat: Persist userId if reported with successful authentication through action result interface
+</Update>
+
+<Update label="Oct. 20, 2024" description="v1.9.12">
+  Identity verification:
+  - feat: Improve texts on capturing pages
+</Update>
+
+<Update label="Oct. 13, 2024" description="v1.9.11">
+  Webauthn:
+  - fix: Authentication timeout configuration issue
+</Update>
+
+<Update label="Sep. 22, 2024" description="v1.9.10">
+  Detection and response:
+  - fix: Improve event consistency in network failures and re-send also in mid-sessions
+  
+  Identity verification:
+  - fix: fix Portuguese lang initial
+  - feat: add support to french-canadian
+  
+  Identity orchestration:
+  - feat: added support for Transaction Signing with TOTP action.
+  - fix: made the save SDK data operation synchronous to ensure it won't be interrupted.
+</Update>

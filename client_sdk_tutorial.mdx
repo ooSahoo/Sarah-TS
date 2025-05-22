@@ -1,0 +1,132 @@
+---
+title : "Create a client SDK journey"
+description : "Client SDK journeys are the simplest journey type, designed for workflows that require client-side interactions, such as collecting user input, performing device operations, or presenting authentication methods. These journeys run within your client application and leverage the Mosaic SDK."
+---
+
+This tutorial provides an introduction to building client SDK journeys, guiding you through creating a user with an email and password, and authenticating the user using auto-generated client-side code—no app development needed. Ready to start?
+
+<Tip>
+We highly recommend watching the [Journeys 101](/guides/orchestration/getting-started/journey101/) video course first as it provides visual guidance on how to create journeys, add and move nodes, run a test journey, etc.
+</Tip>
+
+## Create app
+
+To integrate with Mosaic, configure an application in the [Admin Portal](https://portal.transmitsecurity.io/application/create) as shown below. For example:
+
+- **Application name**: My demo app
+- **Protocol**: OIDC
+- **Client name**: Demo client
+- **Redirect URIs**: `https://demoapp.com/verify`
+- **Authentication method**: Client secret
+
+Upon saving, Client ID and Client Secret are generated automatically. You'll need them for running the client-side.
+
+## Exercise 1: Create user
+
+Create and execute the journey that collects user details and creates a user:
+
+<Frame>
+    <img src="/images/image-4.png"/>
+</Frame>
+
+### Create journey
+
+Start by creating a blank client SDK journey. You can do it in the Admin Portal, by proceeding to **Orchestration** > **Identity journeys**.
+
+### Add 'Get information from client'
+
+Add the "Get information from client" node that collects an email and password from the user. Complete its configuration as follows:
+
+- Set the **Step ID** to `userForm`
+- Keep the schema as is
+- Keep the default name for the output variable (`clientData`)
+
+### Add 'Register password'
+
+Add the "Register password" node that sets the password for the user record and creates the user if none exists. Complete its configuration as follows:
+
+- Set **User Auth State** to "The user is not authenticated..."
+- Set **external User ID** to `clientData.userEmail`
+- Set **Password** to `clientData.userPassword`
+
+### Run the journey
+
+After saving the journey, you can test the flow. One option is to run the journey in the browser using the **Test journey** button. The other option is to download the code and then run it locally. When running the code locally, provide the Client ID and Secret you obtained in [Create app](/guides/orchestration/getting-started/client_sdk_tutorial/#create-app) step.
+
+Upon initializing the journey, you'll see the default UI provided by Mosaic. You can proceed to submit user details, for example, "user@demoapp.com", "MyPassword123$".
+
+### View user profile
+
+Having created the user, go to **Identity Management** > **Users** in the [Admin Portal](https://portal.transmitsecurity.io/identityManagement/users) to view the user profile.
+
+## Exercise 2: Login user
+
+Create and execute the journey that allows a user to enter their credentials and authenticates a user with a password:
+
+<Frame>
+    <img src="/images/image-5.png"/>
+</Frame>
+
+### Create journey
+
+Start by creating a blank client SDK journey. You can do it in the Admin Portal, by proceeding to **Orchestration** > **Identity journeys**.
+
+### Add 'Login form'
+
+Add the "Login form" node that allows a user to enter their credentials. Complete its configuration as follows:
+
+- Keep the **Step ID** as is
+- Disable all authentication methods except **Password**
+- Set the output variable to `loginData`
+
+The "Password authentication" node is added automatically and is configured to use credentials stored in the `loginData` variable.
+
+### Run the journey
+
+After saving the journey, you can test the flow. One option is to run the journey in the browser using the **Test journey** button. The other option is to download the code and then run it locally. When running the code locally, provide the Client ID and Secret you obtained in [Create app](/guides/orchestration/getting-started/client_sdk_tutorial/#create-app) step.
+
+Upon initializing the journey, you'll see the default UI provided by Mosaic. You can proceed to submit the credentials of the user you created in [Exercise 1](/guides/orchestration/getting-started/client_sdk_tutorial/#exercise-1-create-user), for example, "user@demoapp.com", "MyPassword123$".
+
+### View user activity
+
+Proceed to **Events** / **User Activity** to see events related to this user. You'll see the user login event.
+
+## Next steps
+
+### Want to continue playing with Identity Orchestration?
+
+Consider combining the journeys you created into a single flow and adding more authentication options.
+
+### Ready to start building apps?
+
+Learn how to integrate identity orchestration into your apps:
+
+Here are some ways to get started:
+
+<CardGroup>
+<Card
+  title="Web SDK Quickstart"
+  href="/guides/orchestration/getting-started/quick_start_web/"
+  icon="globe"
+  iconType="solid"
+  horizontal
+/>
+<Card
+  title="iOS SDK Quickstart"
+  href="/guides/orchestration/getting-started/quick_start_ios/"
+  icon="apple"
+  iconType="solid"
+  horizontal
+/>
+<Card
+  title="Android SDK Quickstart"
+  href="/guides/orchestration/getting-started/quick_start_android/"
+  icon="android"
+  iconType="solid"
+  horizontal
+/>
+</CardGroup>
+
+### Want to delete the fake user you created?
+
+There's nothing like a good clean-up. You can do this from the Admin Portal. From **Identity Management** > **Users**, hover over your user in the user list, click<Icon icon="ellipsis-vertical" iconType="solid"/> on the right, and click **Delete**.

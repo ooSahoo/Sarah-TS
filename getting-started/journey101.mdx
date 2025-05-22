@@ -1,0 +1,86 @@
+---
+title : "Journeys 101"
+description : "Welcome to the Journeys 101 video course. The video lessons will walk you through the basics of journey creation to help you get comfortable with identity journeys before you start diving deeper. The videos demonstrate simple real-life use cases that you are welcome to recreate in your environment."
+---
+
+## Journey editor fundamentals
+
+The lesson below will get you familiar with the journey editor, journey creation, and editing.
+
+<Frame>
+<video
+  controls
+  className="w-full aspect-video"
+  src="https://developer.transmitsecurity.com/0e66cffc5b01e9db3c3fb9474512fa26/1.journey-creation-fundamentals.mp4"
+></video>
+</Frame>
+
+
+## Client interactions
+
+The lesson below will dive into basic client interactions. It demonstrates how to use the following journey steps:
+
+1. [Get Information from Client](/guides/orchestration/journeys/get_info_from_client/), allows presenting a generic client-side form that collects data
+2. [Display Information](/guides/orchestration/journeys/display_information/), allows displaying dynamic information on the client side. These forms are mostly used during journey building and debugging
+
+<Frame>
+<video
+  controls
+  className="w-full aspect-video"
+  src="https://developer.transmitsecurity.com/019b6cfa281d0c943b6aca54798c80c5/2.hello-world-template.mp4"
+></video>
+</Frame>
+
+## Control structures
+
+The lesson below explains how to use the journey control structures:
+
+1. [Generic Condition](/guides/orchestration/journeys/condition/), allows journey branching on dynamic data
+2. [Set Temporary Variables](/guides/orchestration/journeys/set_temporary_variables/), allows creating variables that can store data and calculations, to be used throughout the journey
+3. [While Loop](/guides/orchestration/journeys/while_loop/), allows wrapping a specific part of the journey as a loop, with variables and exit condition
+
+<Frame>
+<video
+  controls
+  className="w-full aspect-video"
+  src="https://developer.transmitsecurity.com/06f07b3d8421183f8d63329b88423f65/3.hello-control-structures-template.mp4"
+></video>
+</Frame>
+
+## Passwords: registration & authentication
+
+The lesson below introduces authentications and implements the password authentication flow.
+
+1. [Register Password](/guides/orchestration/journeys/register_password/), registers a password, creating a user record if needed
+2. [Login Form](/guides/orchestration/journeys/login_form/), presents a login form. This is a fundamental step for collecting user credentials, irrespective of authenticator type
+3. [Password Authentication](/guides/orchestration/journeys/authenticate_password/), authenticates a user with a password
+
+<Frame>
+<video
+  controls
+  className="w-full aspect-video"
+  src="https://developer.transmitsecurity.com/d4b407692d465c608e5f9f5a0637caf2/4.password-registration-authentication-template.mp4"
+></video>
+</Frame>
+
+## Passkeys: registration & authentication
+
+The lesson below extends authentications, introducing the Passkeys:
+
+1. [Register Passkey](/guides/orchestration/journeys/register_webauthn/), registers a Passkey, creating a user record if needed
+2. [Passkey Authentication](/guides/orchestration/journeys/authenticate_passkeys/), authenticates a user with a passkey
+
+<Frame>
+<video
+  controls
+  className="w-full aspect-video"
+  src="https://developer.transmitsecurity.com/c86abcfb7b15620ef643e1516771d1b7/5.passkeys-registration-authentication-template.mp4"
+></video>
+</Frame>
+
+## TOTP: registration & authentication
+
+The lesson below extends authentications, introducing the TOTP (Time-based One-Time Passwords):
+
+1. [Register TOTP](/guides/orchestration/journeys/register_totp/), registers a TOTP authenticator with an authenticator app
+2. [TOTP Authentication](/guides/orchestration/journeys/authenticate_totp/), authenticates a user with a registered TOTP authenticator

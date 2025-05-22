@@ -1,4 +1,4 @@
-# Hello Starter Kit
+# Mintlify Starter Kit
 
 Click on `Use this template` to copy the Mintlify starter kit. The starter kit contains examples including
 
@@ -16,7 +16,7 @@ Install the [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview th
 npm i -g mintlify
 ```
 
-Run the following command at the root of your documentation (where docs.json is)
+Run the following command at the root of your documentation (where mint.json is)
 
 ```
 mintlify dev
@@ -24,15 +24,21 @@ mintlify dev
 
 ### Publishing Changes
 
-Install our Github App to auto propagate changes from your repo to your deployment. Changes will be deployed to production automatically after pushing to the default branch. Find the link to install on your dashboard.
+Install our Github App to auto propagate changes from your repo to your deployment. Changes will be deployed to production automatically after pushing to the default branch. Find the link to install on your dashboard. 
 
 #### Troubleshooting
 
 - Mintlify dev isn't running - Run `mintlify install` it'll re-install dependencies.
-- Page loads as a 404 - Make sure you are running in a folder with `docs.json`
+- Page loads as a 404 - Make sure you are running in a folder with `mint.json`
 
 #### Clean build data
 
 ```
 rm -rf .mintlify-last
 ```
+#### Clear preview
+
+```
+mit dev --clear
+```
+
